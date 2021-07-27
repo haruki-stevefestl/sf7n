@@ -23,9 +23,9 @@ function Search-CSV ($SearchText, $SearchFrom) {
         $SearchTerm.PSObject.Properties.ForEach({
             $Header = $_.Name
             # Take into account of empty alias strings
-            $Count  = ($SearchFromAlias.$Header | Where-Object {$_}).Count
+            $Count  = ($csvAlias.$Header | Where-Object {$_}).Count
             for ($i = 0; $i -lt $Count; $i += 2) {
-                $_.Value = $_.Value.Replace($SearchFromAlias[$i+1].$Header, $SearchFromAlias[$i].$Header)
+                $_.Value = $_.Value.Replace($csvAlias[$i+1].$Header, $csvAlias[$i].$Header)
             }
         })
     }
@@ -33,7 +33,7 @@ function Search-CSV ($SearchText, $SearchFrom) {
     # Search with new Powershell instance
     $Ps = [PowerShell]::Create().AddScript{
         function Update-GUI ([Action] $Action) {
-            $wpf.SF7N.Dispatcher.Invoke($Action, 'ApplicationIdle')
+            $wpf.Rows.Dispatcher.Invoke($Action, 'ApplicationIdle')
         }
 
         [Collections.ArrayList] $Search = @()
