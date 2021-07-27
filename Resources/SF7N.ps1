@@ -25,10 +25,11 @@ Write-Log 'SF7N 1.7'
 Write-Log '-------------------------'
 Write-Log 'Set    Defaults Parameters'
 $PSDefaultParameterValues = @{'*:Encoding' = 'UTF8'}
+Unblock-File $PSScriptRoot\SF7N.ps1
 Set-Location $PSScriptRoot\Functions
 Unblock-File DataContext.ps1, IO.ps1, Edit.ps1, Initialize.ps1, Search.ps1, XAML.ps1
 Set-Location $PSScriptRoot\Handlers
-Unblock-File Config.ps1, Edit.ps1, Lifecycle.ps1, Search.ps1
+Unblock-File Edit.ps1, Lifecycle.ps1, Search.ps1
 Set-Location $PSScriptRoot
 
 # Configurations & DataContext
@@ -50,7 +51,7 @@ foreach ($Module in 'IO','Search','Edit') {
 
 # Handlers
 Write-Log 'Import Handlers'
-foreach ($Module in 'Search','Edit','Config','Lifecycle') {
+foreach ($Module in 'Search','Edit','Lifecycle') {
     Write-Log ('  - '+$Module)
     Import-Module .\Handlers\$Module.ps1 -Force
 }
@@ -59,5 +60,4 @@ Remove-Variable Module
 # Display GUI
 # Execution goes to Handlers\Lifecycle.ps1
 Write-Log '-------------------------'
-$wpf.TabControl.SelectedIndex = 0
 [Void] $wpf.SF7N.ShowDialog()
