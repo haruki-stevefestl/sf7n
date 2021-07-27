@@ -21,7 +21,7 @@ trap {
 }
 
 # Defaults for SF7N
-Write-Log 'SF7N 1.7'
+Write-Log 'SF7N 1.6'
 Write-Log '-------------------------'
 Write-Log 'Set    Defaults Parameters'
 $PSDefaultParameterValues = @{'*:Encoding' = 'UTF8'}
