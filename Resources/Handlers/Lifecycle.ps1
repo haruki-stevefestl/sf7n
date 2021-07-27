@@ -9,7 +9,7 @@ $wpf.SF7N.Add_ContentRendered({
     Search-CSV $wpf.Searchbar.Text $csv
 })
 
-# Prompt exit if unsaved
+# Prompt on exit if unsaved
 $wpf.SF7N.Add_Closing({
     if ($wpf.Commit.IsEnabled) {
         $Dialog = New-Dialog 'Commit changes before exiting?' 'YesNoCancel' 'Question'
@@ -21,6 +21,10 @@ $wpf.SF7N.Add_Closing({
     }
 
     # Cleanup
+    Write-Log 'Cleanup'
     Remove-Variable baseDir,config,context,csv,
         csvAlias,csvHeader,startTime,wpf -Scope Script -Force
+
+    Remove-Module Config,DataContext,Edit,Initialize,IO,
+        Lifecycle,Search,XAML -Force
 })

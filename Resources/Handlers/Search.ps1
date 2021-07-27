@@ -12,7 +12,7 @@ $wpf.Search.Add_Click({Search-CSV $wpf.Searchbar.Text $csv})
 
 # Set preview on cell change
 $wpf.CSVGrid.Add_SelectionChanged({
-    # Expand <.+?> notation
+    # Expand <ColumnName> notation
     $Preview = Expand-Path $context.PreviewPath
     $Regex   = '(?<=<)(.+?)(?=>)'
     ($Preview | Select-String $Regex -AllMatches).Matches.Value.ForEach({
@@ -24,12 +24,12 @@ $wpf.CSVGrid.Add_SelectionChanged({
 
 # Copy preview
 $wpf.PreviewCopy.Add_Click({
-    if (Test-Path $wpf.Preview.Source) {
+    $Preview = $wpf.Preview.Source.ToString()
+    $Preview = $Preview.Replace('file:///','')
+
+    if (Test-Path $Preview) {
         [Windows.Forms.Clipboard]::SetImage([Drawing.Image]::FromFile(
-            $wpf.Preview.Source
+            $Preview
         ))
     }
 })
-
-# Open config page
-$wpf.Settings.Add_Click({$wpf.TabControl.SelectedIndex = 2})
