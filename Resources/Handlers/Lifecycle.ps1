@@ -1,7 +1,7 @@
 # Work after splashscreen shows
-$wpf.SF7N.Add_ContentRendered({
+$wpf.Rows.Add_ContentRendered({
     Import-Module .\Functions\Initialize.ps1 -Force
-    Initialize-SF7N
+    Initialize-Rows
 
     Write-Log 'Import WinForms'
     Add-Type -AssemblyName System.Windows.Forms, System.Drawing 
@@ -10,9 +10,9 @@ $wpf.SF7N.Add_ContentRendered({
 })
 
 # Prompt on exit if unsaved
-$wpf.SF7N.Add_Closing({
+$wpf.Rows.Add_Closing({
     if ($wpf.Commit.IsEnabled) {
-        $Dialog = New-Dialog 'Commit changes before exiting?' 'YesNoCancel' 'Question'
+        $Dialog = New-Dialog 'Save changes before exiting?' 'YesNoCancel' 'Question'
         if ($Dialog -eq 'Cancel') {
             $_.Cancel = $true
         } elseif ($Dialog -eq 'Yes') {

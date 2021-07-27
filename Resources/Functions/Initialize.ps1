@@ -1,5 +1,5 @@
-function Initialize-SF7N {
-    Write-Log 'Init.  SF7N'
+function Initialize-Rows {
+    Write-Log 'Init.  Rows'
     $wpf.TabControl.SelectedIndex = 0
 
     # Import CSV

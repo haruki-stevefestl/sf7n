@@ -1,4 +1,20 @@
-# SF7N
+# Rows
 A Powershell/WPF-based CSV searching tool and editor.
 
-To use this software, simply download the entire folder and run `.\SF7N-Launcher.cmd` - the launcher will take care of the rest. The core features are done, but they might be buggy. Feel free to report bugs!
+---
+
+This program can:
+* Search a CSV
+  * Display user-friendly aliases instead of raw data
+  * Display a preview based on the selected row
+  * Support conditional formatting
+  * Support regular expressions
+
+<br>
+
+* Edit a CSV
+  * Add/remove rows
+  * Change existing rows
+
+<br>
+This program is not a replacement of spreadsheet programs like Excel.

@@ -12,10 +12,10 @@
         "cwd": "${file}"
     },
         {
-            "name": "PowerShell: SF7N",
+            "name": "PowerShell: Rows",
             "type": "PowerShell",
             "request": "launch",
-            "script": "${workspaceFolder}/Resources/SF7N",
+            "script": "${workspaceFolder}/Resources/Rows.ps1",
             "cwd": "${workspaceFolder}"
         }
     ]

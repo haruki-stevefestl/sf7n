@@ -10,22 +10,23 @@ function Write-Log ($Log) {
 }
 
 function New-Dialog ($Message = '', $Option = 'OK', $Icon = 'Information') {
-    return [Windows.MessageBox]::Show($Message, 'SF7N', $Option, $Icon)
+    return [Windows.MessageBox]::Show($Message, 'Rows', $Option, $Icon)
 }
 
 # Error handling
 trap {
+    throw $_
     New-Dialog "Error: $_`n`nClick OK to exit" 'OK' 'Error'
-    if ($wpf) {$wpf.SF7N.Close()} # IF to prevent error before GUI shows
+    if ($wpf) {$wpf.Rows.Close()} # IF to prevent error before GUI shows
     exit
 }
 
-# Defaults for SF7N
-Write-Log 'SF7N 1.6'
+# Defaults for Rows
+Write-Log 'Rows 1.7'
 Write-Log '-------------------------'
 Write-Log 'Set    Defaults Parameters'
 $PSDefaultParameterValues = @{'*:Encoding' = 'UTF8'}
-Unblock-File $PSScriptRoot\SF7N.ps1
+Unblock-File $PSScriptRoot\Rows.ps1
 Set-Location $PSScriptRoot\Functions
 Unblock-File DataContext.ps1, IO.ps1, Edit.ps1, Initialize.ps1, Search.ps1, XAML.ps1
 Set-Location $PSScriptRoot\Handlers
@@ -40,7 +41,7 @@ $script:context = New-DataContext $config
 # XAML & GUI
 Import-Module .\Functions\XAML.ps1 -Force
 $script:wpf = New-GUI .\GUI.xaml
-$wpf.SF7N.DataContext = $context
+$wpf.Rows.DataContext = $context
 
 # GUI Functions
 Write-Log 'Import GUI Functions'
@@ -60,4 +61,5 @@ Remove-Variable Module
 # Display GUI
 # Execution goes to Handlers\Lifecycle.ps1
 Write-Log '-------------------------'
-[Void] $wpf.SF7N.ShowDialog()
+$wpf.TabControl.SelectedIndex = 0
+[Void] $wpf.Rows.ShowDialog()
