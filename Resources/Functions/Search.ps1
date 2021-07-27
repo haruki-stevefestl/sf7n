@@ -6,7 +6,6 @@ function Search-CSV ($SearchText, $SearchFrom) {
     }
 
     $wpf.CSVGrid.ItemsSource = $null
-    $wpf.Commit.IsEnabled = $false
     $wpf.Status.Text = 'Searching'
     $wpf.Preview.Source = $null
 
@@ -37,7 +36,7 @@ function Search-CSV ($SearchText, $SearchFrom) {
             $wpf.SF7N.Dispatcher.Invoke($Action, 'ApplicationIdle')
         }
 
-        [Collections.ArrayList] $SearchFromSearch = @()
+        [Collections.ArrayList] $Search = @()
         foreach ($Entry in $SearchFrom) {
             if ('' -ne $SearchTerm) {
                 # If notMatch, goto next iteration
@@ -52,23 +51,23 @@ function Search-CSV ($SearchText, $SearchFrom) {
                 $Row.PSObject.Properties.ForEach({
                     $Header = $_.Name
                     # Take into account of empty alias strings
-                    $Count  = ($SearchFromAlias.$Header | Where-Object {$_}).Count
+                    $Count  = ($csvAlias.$Header | Where-Object {$_}).Count
                     for ($i = 0; $i -lt $Count; $i += 2) {
-                        $_.Value = $_.Value.Replace($SearchFromAlias[$i].$Header, $SearchFromAlias[$i+1].$Header)
+                        $_.Value = $_.Value.Replace($csvAlias[$i].$Header, $csvAlias[$i+1].$Header)
                     }
                 })
-                $SearchFromSearch.Add($Row)
+                $Search.Add($Row)
             } else {
-                $SearchFromSearch.Add($Entry)
+                $Search.Add($Entry)
             }
 
             # Show preliminary results
-            if ($SearchFromSearch.Count -eq 25) {
-                Update-GUI {$wpf.CSVGrid.ItemsSource = $SearchFromSearch.PSObject.Copy()}
+            if ($Search.Count -eq 25) {
+                Update-GUI {$wpf.CSVGrid.ItemsSource = $Search.PSObject.Copy()}
             }
         }
         # Show full results
-        Update-GUI {$wpf.CSVGrid.ItemsSource = $SearchFromSearch}
+        Update-GUI {$wpf.CSVGrid.ItemsSource = $Search}
         Update-GUI {$wpf.Status.Text = 'Ready'}
     }
     
