@@ -14,9 +14,6 @@
         <SolidColorBrush x:Key="Brush_Highlight" Color="#CCE8FF"/>
         <SolidColorBrush x:Key="Brush_Control" Color="#E5F3FF"/>
         <SolidColorBrush x:Key="Brush_Border" Color="#727272"/>
-        <Color x:Key="Color_Foreground" R="0" G="0" B="0" A="255"/>
-        <Color x:Key="Color_Highlight" R="204" G="232" B="255" A="255" />
-        <Color x:Key="Color_Control" R="229" G="243" B="255" A="255"/>
         <SolidColorBrush x:Key="Brush_Scroll_Static" Color="#DDDDDD"/>
         <SolidColorBrush x:Key="Brush_Scroll_MouseOver" Color="#CCCCCC"/>
         <SolidColorBrush x:Key="Brush_Scroll_Pressed" Color="#AAAAAA"/>
@@ -550,14 +547,11 @@
                     </TabControl>
                 </Grid>
 
-                <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Height="4" IsIndeterminate="True" VerticalAlignment="Top" Background="Transparent" BorderThickness="0">
+                <ProgressBar Name="ProgessBar" Grid.Row="1" Grid.ColumnSpan="2" Height="4" IsIndeterminate="True" VerticalAlignment="Top" Background="Transparent" BorderThickness="0">
                     <ProgressBar.Style>
                         <Style TargetType="ProgressBar">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ElementName=Status, Path=Text}" Value="Searching">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ElementName=Status, Path=Text}" Value="Saving">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -567,34 +561,52 @@
                 </ProgressBar>
 
                 <!-- Empty CSV messages -->
-                <TabControl Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" BorderThickness="0" Background="Transparent">
-                    <TabControl.Style>
-                        <Style TargetType="TabControl">
+                <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ElementName=CSVGrid, Path=Items.Count}" Value="0">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding ElementName=Status, Path=Text}" Value="Editing">
-                                    <Setter Property="SelectedIndex" Value="1"/>
-                                </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="Visibility" Value="Hidden"/>
-                            <Setter Property="SelectedIndex" Value="0"/>
                         </Style>
-                    </TabControl.Style>
-                    <TabItem>
-                        <StackPanel>
-                            <TextBlock Style="{StaticResource Caption}" Text="The search returns no matches yet." HorizontalAlignment="Center"/>
-                            <TextBlock Style="{StaticResource Caption}" Text="Try other search criteria or await pending results." Margin="0,8,0,0"/>
-                        </StackPanel>
-                    </TabItem>
-                    <TabItem>
-                        <StackPanel>
-                            <TextBlock Style="{StaticResource Caption}" Text="The input file has no rows." HorizontalAlignment="Center"/>
-                            <TextBlock Style="{StaticResource Caption}" Text="Press &quot;Append&quot; to fill in the file." Margin="0,8,0,0"/>
-                        </StackPanel>
-                    </TabItem>
-                </TabControl>
+                    </StackPanel.Style>
+                    <TextBlock HorizontalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=ProgessBar, Path=IsVisible}" Value="True">
+                                        <Setter Property="Text" Value="Search in Progress"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=ProgessBar, Path=IsVisible}" Value="False">
+                                        <Setter Property="Text" Value="No Results"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=Status, Path=Text}" Value="Editing">
+                                        <Setter Property="Text" Value="Empty File"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Margin="0,8,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=ProgessBar, Path=IsVisible}" Value="True">
+                                        <Setter Property="Text" Value="Please await pending results."/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=ProgessBar, Path=IsVisible}" Value="False">
+                                        <Setter Property="Text" Value="Please try other search criteria."/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=Status, Path=Text}" Value="Editing">
+                                        <Setter Property="Text" Value="Press &quot;Append&quot; to fill in the file."/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
 
                 <!-- Datagrid -->
                 <DataGrid Name="CSVGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,8,0,0" MinColumnWidth="48"
@@ -612,10 +624,10 @@
                         </Style>
                         <Style TargetType="DataGridRow">
                             <Style.Resources>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{StaticResource Color_Highlight}"/>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="{StaticResource Color_Control}"/>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{StaticResource Color_Foreground}"/>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="{StaticResource Color_Foreground}"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{Binding Source={StaticResource Brush_Highlight}, Path=Color}"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="{Binding Source={StaticResource Brush_Control}, Path=Color}"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{Binding Source={StaticResource Brush_Foreground}, Path=Color}"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="{Binding Source={StaticResource Brush_Foreground}, Path=Color}"/>
                             </Style.Resources>
                             <Setter Property="Background" Value="Transparent"/>
                         </Style>
@@ -669,13 +681,13 @@
                 </DataGrid>
 
                 <!-- Preview -->
-                <Button Name="PreviewCopy" Margin="8,8,0,0" Grid.Row="1" Grid.Column="1">
+                <Button Name="PreviewCopy" Grid.Row="1" Grid.Column="1">
                     <Button.Style>
                         <Style TargetType="Button">
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="Button">
-                                        <Border x:Name="Border" BorderThickness="0" Background="Transparent">
+                                        <Border x:Name="Border" BorderThickness="0">
                                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
                                         <ControlTemplate.Triggers>
@@ -691,16 +703,16 @@
                             </Setter>
                         </Style>
                     </Button.Style>
+                    <Grid>
+                        <TextBlock Text="Click to copy image" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource Caption}"/>
+                        <Image Name="Preview"/>
+                    </Grid>
                 </Button>
-                <Grid Grid.Row="1" Grid.Column="1">
-                    <TextBlock Text="Click to copy image" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource Caption}"/>
-                    <Image Name="Preview"/>
-                </Grid>
                 <GridSplitter Grid.Row="1" Grid.Column="1" Width="8" Background="Transparent" HorizontalAlignment="Left"/>
 
                 <!-- Stausbar -->
                 <DockPanel Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom">
-                    <TextBlock Margin="0,0,96,0">
+                    <TextBlock>
                         <TextBlock.Style>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
                                 <Style.Triggers>
@@ -712,8 +724,7 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-
-                    <TextBlock Text="{Binding ElementName=CSVGrid, Path=Items.Count, StringFormat='\{0\} item(s)'}" Style="{StaticResource Caption}" Margin="0,0,48,0"/>
+                    <TextBlock Text="{Binding ElementName=CSVGrid, Path=Items.Count, StringFormat='\{0\} item(s)'}" Style="{StaticResource Caption}" Margin="96,0,48,0"/>
                     <TextBlock Text="{Binding ElementName=CSVGrid, Path=SelectedItems.Count, StringFormat='\{0\} selected'}" Style="{StaticResource Caption}"/>
                     <TextBlock Name="Status" Style="{StaticResource Caption}" HorizontalAlignment="Right"/>
                 </DockPanel>
