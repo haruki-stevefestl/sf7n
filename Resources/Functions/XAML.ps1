@@ -1,10 +1,10 @@
-function New-GUI ($ImportFrom) {
+function New-GUI ($ImportFrom, $DataContext) {
     Write-Log 'New    GUI'
     Write-Log '  - Read XAML'
     [Xml] $Xaml = Get-Content $ImportFrom
-    $Xaml = Set-GUITheme $Xaml
 
     Write-Log '  - Parse XAML'
+    $Xaml = Set-GUITheme $Xaml $context.Theme
     $Form = [Windows.Markup.XamlReader]::Load([Xml.XmlNodeReader]::New($Xaml))
 
     # Populate $Hash with elements
@@ -13,37 +13,25 @@ function New-GUI ($ImportFrom) {
     $Xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]").Name.ForEach({
         if ($Hash.Keys -notcontains $_) {$Hash.Add($_, $Form.FindName($_))}
     })
+    $Hash.Rows.DataContext = $DataContext
     return $Hash
 }
 
-function Set-GUITheme ($Xaml) {
+function Set-GUITheme ($Xaml, $Theme) {
     Write-Log '  - Set-GUITheme'
-    $Theme = ".\Configurations\Themes\$($context.Theme).ini"
-    if (Test-Path $Theme) {
-        $Resource = $Xaml.Window.'Window.Resources'
-        
+    $Theme = ".\Configurations\Themes\$Theme.ini"
+    if (Test-Path $Theme) {        
+        $Brushes = $Xaml.Window.'Window.Resources'.SolidColorBrush
+
         # ConvertFrom-StringData hates paddings so parse the .ini manually
         foreach ($Line in (Get-Content $Theme)) {
             $Data = $Line.Split('=').Trim()
-            $ThisBrush = "Brush_" + $Data[0]
+            $ThisBrush = $Data[0]
             $ThisValue = $Data[1]
 
             # Apply SolidColorBrush
-            $Resource.SolidColorBrush.Where({$_.Key -eq $ThisBrush}).ForEach({
+            $Brushes.Where({$_.Key -eq "Brush_$ThisBrush"}).ForEach({
                 $_.Color = $ThisValue
-            })
-        }
-
-        # Convert SolidColorBrush to Color
-        # Required for datagrids (only accepts Color)
-        foreach ($Color in $Resource.Color) {
-            $BrushName = $Color.Key -replace 'Color','Brush'
-
-            $Resource.SolidColorBrush.Where({$_.Key -eq $BrushName}).
-            Color.Substring(1).ForEach({
-                $Color.R = [String][Convert]::ToInt16($_.Substring(0,2), 16)
-                $Color.G = [String][Convert]::ToInt16($_.Substring(2,2), 16)
-                $Color.B = [String][Convert]::ToInt16($_.Substring(4,2), 16)
             })
         }
     }
