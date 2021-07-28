@@ -26,7 +26,7 @@ Write-Log 'Rows 1.7'
 Write-Log '-------------------------'
 Write-Log 'Set    Defaults Parameters'
 $PSDefaultParameterValues = @{'*:Encoding' = 'UTF8'}
-Unblock-File $PSScriptRoot\Rows.ps1
+Unblock-File $PSCommandPath
 Set-Location $PSScriptRoot\Functions
 Unblock-File DataContext.ps1, IO.ps1, Edit.ps1, Initialize.ps1, Search.ps1, XAML.ps1
 Set-Location $PSScriptRoot\Handlers
@@ -35,27 +35,20 @@ Set-Location $PSScriptRoot
 
 # Configurations & DataContext
 Import-Module .\Functions\DataContext.ps1 -Force
-$script:config  = Import-Configuration .\Configurations\General.ini
-$script:context = New-DataContext $config
+$script:context = New-DataContext (Import-Configuration .\Configurations\General.ini)
 
 # XAML & GUI
 Import-Module .\Functions\XAML.ps1 -Force
-$script:wpf = New-GUI .\GUI.xaml
-$wpf.Rows.DataContext = $context
+$script:wpf = New-GUI .\GUI.xaml $context
 
-# GUI Functions
-Write-Log 'Import GUI Functions'
-foreach ($Module in 'IO','Search','Edit') {
-    Write-Log ('  - '+$Module)
+# GUI Modules
+Write-Log 'Import Modules'
+foreach ($Module in 'Search','Edit') {
     Import-Module .\Functions\$Module.ps1 -Force
-}
-
-# Handlers
-Write-Log 'Import Handlers'
-foreach ($Module in 'Search','Edit','Lifecycle') {
-    Write-Log ('  - '+$Module)
     Import-Module .\Handlers\$Module.ps1 -Force
 }
+Import-Module .\Functions\IO.ps1 -Force
+Import-Module .\Handlers\Lifecycle.ps1 -Force
 Remove-Variable Module
 
 # Display GUI

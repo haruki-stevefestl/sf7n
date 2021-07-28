@@ -22,8 +22,8 @@ $wpf.Rows.Add_Closing({
 
     # Cleanup
     Write-Log 'Cleanup'
-    Remove-Variable baseDir,config,context,csv,
-        csvAlias,csvHeader,startTime,wpf -Scope Script -Force
+    Remove-Variable baseDir,context,wpf,startTime,
+        csvAlias,csvHeader,csv -Scope Script -Force
 
     Remove-Module Config,DataContext,Edit,Initialize,IO,
         Lifecycle,Search,XAML -Force

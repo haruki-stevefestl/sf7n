@@ -1,13 +1,14 @@
 # Start search
 $wpf.Searchbar.Add_TextChanged({
-    $PrevCursor = $wpf.Searchbar.SelectionStart - 2
     if ($wpf.Searchbar.Text -match '[\r\n]') {
+        $PrevCursor = $wpf.Searchbar.SelectionStart - 2
         $wpf.Searchbar.Text = $wpf.Searchbar.Text -replace '[\r\n]'
         $wpf.Searchbar.SelectionStart = $PrevCursor
 
         Search-CSV $wpf.Searchbar.Text $csv
     }
 })
+
 $wpf.Search.Add_Click({Search-CSV $wpf.Searchbar.Text $csv})
 
 # Set preview on cell change
