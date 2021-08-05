@@ -1,5 +1,11 @@
 # Work after splashscreen shows
 $wpf.Rows.Add_ContentRendered({
+    # Minimize console
+    if ($Host.Name -eq 'ConsoleHost') {
+        powershell.exe -Window minimized -Command "#"
+    }
+
+    # Import CSV and generate columns
     Import-Module .\Functions\Initialize.ps1 -Force
     Initialize-Rows
 
