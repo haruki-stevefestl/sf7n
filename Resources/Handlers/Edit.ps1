@@ -1,9 +1,7 @@
 # Enter edit mode
 $wpf.CSVGrid.Add_BeginningEdit({
     $wpf.Status.Text = 'Editing'
-    if ($wpf.Mode.SelectedIndex -eq 0) {
-        $wpf.Mode.SelectedIndex = 1
-    }
+    $wpf.Mode.SelectedIndex = 1
 })
 
 # Change rows (add/remove)
