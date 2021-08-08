@@ -6,21 +6,23 @@ function Search-CSV ($SearchText, $SearchFrom) {
     }
 
     $wpf.CSVGrid.ItemsSource = $null
-    $wpf.Status.Text = 'Searching'
-    $wpf.Preview.Source = $null
+    $wpf.Preview.Source      = $null
+    $wpf.Status.Text         = 'Searching'
 
-    # Parse SearchRules Text into [PSCustomObject] $SearchTerm
-    $SearchTerm = [PSCustomObject] @{}
-    $Regex = '(["'']?)(.+?)\1[:=](["'']?)(.+?)\3(\s|$)'
+    # Parse SearchRules Text into [PSCustomObject] $Criteria
+    $Criteria = [PSCustomObject] @{}
+    $Regex    = '(["'']?)(.+?)\1[:=](["'']?)(.+?)\3(\s|$)'
+    $Match    = ($SearchText | Select-String $Regex -AllMatches).Matches
 
-    ($SearchText | Select-String $Regex -AllMatches).Matches.ForEach({
-        $SearchTerm |
-        Add-Member -NotePropertyName $_.Groups[2].Value $_.Groups[4].Value
+    $Match.ForEach({
+        $Header = $_.Groups[2].Value
+        $Value  = $_.Groups[4].Value
+        $Criteria | Add-Member -NotePropertyName $Header $Value
     })
 
     # Apply input alias
     if ($context.InputAlias) {
-        $SearchTerm.PSObject.Properties.ForEach({
+        $Criteria.PSObject.Properties.ForEach({
             $Header = $_.Name
             # Take into account of empty alias strings
             $Count  = ($csvAlias.$Header | Where-Object {$_}).Count
@@ -38,9 +40,9 @@ function Search-CSV ($SearchText, $SearchFrom) {
 
         [Collections.ArrayList] $Search = @()
         foreach ($Entry in $SearchFrom) {
-            if ('' -ne $SearchTerm) {
+            if ('' -ne $Criteria) {
                 # If notMatch, goto next iteration
-                $SearchTerm.PSObject.Properties.ForEach({
+                $Criteria.PSObject.Properties.ForEach({
                     if ($Entry.($_.Name) -notmatch $_.Value) {continue}
                 })
             }
@@ -76,7 +78,7 @@ function Search-CSV ($SearchText, $SearchFrom) {
     $Ps.Runspace.ApartmentState = 'STA'
     $Ps.Runspace.ThreadOptions = 'ReuseThread'
     $Ps.Runspace.Open()
-    (Get-Variable wpf,SearchFrom,SearchTerm,csvAlias,context).ForEach({
+    (Get-Variable wpf,SearchFrom,Criteria,csvAlias,context).ForEach({
         $Ps.Runspace.SessionStateProxy.SetVariable($_.Name, $_.Value)
     })
     $Ps.BeginInvoke()
