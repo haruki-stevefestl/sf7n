@@ -1,14 +1,11 @@
-function Import-Configuration ($ImportFrom) {
-    Write-Log 'Import Configuration'
-    return Get-Content $ImportFrom | ConvertFrom-StringData
-}
-
 function Expand-Path ($Path) {
     return ($ExecutionContext.InvokeCommand.ExpandString($Path))
 }
 
-function New-DataContext ($Key) {
+function New-DataContext ($ImportFrom) {
     Write-Log 'New    DataContext'
+    $Key = Get-Content $ImportFrom | ConvertFrom-StringData
+
     return ([PSCustomObject] @{
         csvLocation  = $Key.csvLocation
         PreviewPath  = $Key.PreviewPath
