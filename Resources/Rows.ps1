@@ -23,7 +23,7 @@ trap {
 # Defaults for Rows
 Write-Log 'Rows 1.7'
 Write-Log '-------------------------'
-Write-Log 'Set    Defaults Parameters'
+Write-Log 'Set  defaults parameters'
 $PSDefaultParameterValues = @{'*:Encoding' = 'UTF8'}
 $script:baseDir = $PSScriptRoot
 Set-Location $baseDir
@@ -38,7 +38,7 @@ Import-Module .\Functions\XAML.ps1 -Force
 $script:wpf = New-GUI .\GUI.xaml $context
 
 # GUI Modules
-Write-Log 'Import Modules'
+Write-Log 'Load modules'
 foreach ($Module in 'Search','Edit') {
     Import-Module .\Functions\$Module.ps1 -Force
     Import-Module .\Handlers\$Module.ps1 -Force

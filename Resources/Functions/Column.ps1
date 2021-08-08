@@ -1,5 +1,4 @@
-function Initialize-Columns {
-    Write-Log 'Init.  Rows'
+function Initialize-Column {
     $wpf.TabControl.SelectedIndex = 0
 
     # Import CSV
@@ -8,7 +7,7 @@ function Initialize-Columns {
     $wpf.CSVGrid.Columns.Clear()
     
     # Generate datagrid columns
-    Write-Log 'Add    Datagrid Columns'
+    Write-Log 'Add  datagrid columns'
     $Format = '.\Configurations\Formatting.csv'
     if (Test-Path $Format) {$Format = Import-CSV $Format}
 
@@ -20,7 +19,7 @@ function Initialize-Columns {
 
         # Apply conditional formatting
         $i = 0
-        while ($Format.$_[$i] -notmatch '^\s*$') {
+        while ($Format.$_[$i] -match '^\S+$') {
             $Trigger = [Windows.DataTrigger]::New()
             $Trigger.Binding = $Column.Binding
             $Trigger.Value   = $Format.$_[$i]

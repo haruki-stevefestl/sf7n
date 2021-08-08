@@ -6,10 +6,10 @@ $wpf.Rows.Add_ContentRendered({
     }
 
     # Import CSV and generate columns
-    Import-Module .\Functions\Columns.ps1 -Force
-    Initialize-Columns
+    Import-Module .\Functions\Column.ps1 -Force
+    Initialize-Column
 
-    Write-Log 'Import WinForms'
+    Write-Log 'Load WinForms'
     Add-Type -AssemblyName System.Windows.Forms, System.Drawing 
 
     Search-CSV $wpf.Searchbar.Text $csv
@@ -31,6 +31,6 @@ $wpf.Rows.Add_Closing({
     Remove-Variable baseDir,context,wpf,startTime,
         csvAlias,csvHeader,csv -Scope Script -Force
 
-    Remove-Module Config,DataContext,Edit,Initialize,IO,
+    Remove-Module Config,DataContext,Edit,Column,IO,
         Lifecycle,Search,XAML -Force
 })

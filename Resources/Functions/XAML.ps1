@@ -1,14 +1,14 @@
 function New-GUI ($ImportFrom, $DataContext) {
-    Write-Log 'New    GUI'
+    Write-Log 'New  GUI'
     Write-Log '  - Read XAML'
     [Xml] $Xaml = Get-Content $ImportFrom
 
     Write-Log '  - Parse XAML'
-    $Xaml = Set-GUITheme $Xaml $context.Theme
+    $Xaml = Set-XAMLTheme $Xaml $context.Theme
     $Form = [Windows.Markup.XamlReader]::Load([Xml.XmlNodeReader]::New($Xaml))
 
     # Populate $Hash with elements
-    Write-Log '  - Identify Nodes'
+    Write-Log '  - Identify elements'
     $Hash = [Hashtable]::Synchronized(@{})
     $Xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]").Name.ForEach({
         if ($Hash.Keys -notcontains $_) {$Hash.Add($_, $Form.FindName($_))}
@@ -17,8 +17,8 @@ function New-GUI ($ImportFrom, $DataContext) {
     return $Hash
 }
 
-function Set-GUITheme ($Xaml, $Theme) {
-    Write-Log '  - Set-GUITheme'
+function Set-XAMLTheme ($Xaml, $Theme) {
+    Write-Log '  - Set XAML theme'
     $Theme = ".\Configurations\Themes\$Theme.ini"
     if (Test-Path $Theme) {        
         $Brushes = $Xaml.Window.'Window.Resources'.SolidColorBrush
@@ -26,12 +26,12 @@ function Set-GUITheme ($Xaml, $Theme) {
         # ConvertFrom-StringData hates paddings so parse the .ini manually
         foreach ($Line in (Get-Content $Theme)) {
             $Data = $Line.Split('=').Trim()
-            $ThisBrush = $Data[0]
-            $ThisValue = $Data[1]
+            $Brush = $Data[0]
+            $Value = $Data[1]
 
             # Apply SolidColorBrush
-            $Brushes.Where({$_.Key -eq "Brush_$ThisBrush"}).ForEach({
-                $_.Color = $ThisValue
+            $Brushes.Where({$_.Key -eq "Brush_$Brush"}).ForEach({
+                $_.Color = $Value
             })
         }
     }

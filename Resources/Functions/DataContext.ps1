@@ -3,9 +3,10 @@ function Expand-Path ($Path) {
 }
 
 function New-DataContext ($ImportFrom) {
-    Write-Log 'New    DataContext'
+    Write-Log 'Load configurations'
     $Key = Get-Content $ImportFrom | ConvertFrom-StringData
 
+    Write-Log 'New  DataContext'
     return ([PSCustomObject] @{
         csvLocation  = $Key.csvLocation
         PreviewPath  = $Key.PreviewPath
@@ -15,7 +16,5 @@ function New-DataContext ($ImportFrom) {
         InputAlias   = $Key.InputAlias  -ieq 'true'
         OutputAlias  = $Key.OutputAlias -ieq 'true'
         ReadWrite    = $Key.ReadWrite   -ieq 'true'
-        Status       = 'Ready'
-        Preview      = $null
     })
 }

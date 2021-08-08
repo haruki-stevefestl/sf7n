@@ -18,7 +18,9 @@ $wpf.RemoveSelected.Add_Click({
 
 # Commit CSV
 $wpf.Commit.Add_Click({
-    Export-CustomCSV $context.csvLocation
+    Export-CustomCSV $csv $context.csvLocation
     Import-CustomCSV $context.csvLocation
+
+    $wpf.Commit.IsEnabled = $false
     Search-CSV $wpf.Searchbar.Text $csv
 })
