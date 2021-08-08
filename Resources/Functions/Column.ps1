@@ -1,4 +1,4 @@
-function Initialize-Rows {
+function Initialize-Columns {
     Write-Log 'Init.  Rows'
     $wpf.TabControl.SelectedIndex = 0
 
@@ -19,17 +19,19 @@ function Initialize-Rows {
         $Column.CellStyle = [Windows.Style]::New()
 
         # Apply conditional formatting
-        for ($i = 0; $i -lt $Format.$_.Count; $i += 2) {
-            if ($Format.$_[$i] -match '^\s*$') {break}
+        $i = 0
+        while ($Format.$_[$i] -notmatch '^\s*$') {
             $Trigger = [Windows.DataTrigger]::New()
             $Trigger.Binding = $Column.Binding
-            $Trigger.Value = $Format.$_[$i]
+            $Trigger.Value   = $Format.$_[$i]
             $Trigger.Setters.Add([Windows.Setter]::New(
                 [Windows.Controls.DataGridCell]::BackgroundProperty,
                 [Windows.Media.BrushConverter]::New().ConvertFromString($Format.$_[$i+1])
             ))
             $Column.CellStyle.Triggers.Add($Trigger)
+            $i += 2
         }
+
         $wpf.CSVGrid.Columns.Add($Column)
     })
 }

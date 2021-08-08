@@ -6,8 +6,8 @@ $wpf.Rows.Add_ContentRendered({
     }
 
     # Import CSV and generate columns
-    Import-Module .\Functions\Initialize.ps1 -Force
-    Initialize-Rows
+    Import-Module .\Functions\Columns.ps1 -Force
+    Initialize-Columns
 
     Write-Log 'Import WinForms'
     Add-Type -AssemblyName System.Windows.Forms, System.Drawing 
