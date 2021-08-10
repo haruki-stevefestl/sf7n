@@ -1,31 +1,47 @@
 # Start search
-$wpf.Searchbar.Add_TextChanged({
-    if ($wpf.Searchbar.Text -match '[\r\n]') {
-        $PrevCursor = $wpf.Searchbar.SelectionStart - 2
-        $wpf.Searchbar.Text = $wpf.Searchbar.Text -replace '[\r\n]'
-        $wpf.Searchbar.SelectionStart = $PrevCursor
-
-        Search-CSV $wpf.Searchbar.Text $csv
+$rows.Searchbar.Add_TextChanged({
+    if ($rows.Searchbar.Text -match '[\r\n]') {
+        $PrevCursor = $rows.Searchbar.SelectionStart - 2
+        $rows.Searchbar.Text = $rows.Searchbar.Text -replace '[\r\n]'
+        $rows.Searchbar.SelectionStart = $PrevCursor
+        
+        $Parameters = @{
+            SearchText = $rows.Searchbar.Text
+            SearchFrom = $csv
+            InputAlias  = $context.InputAlias
+            OutputAlias = $context.OutputAlias
+            Alias       = $csvAlias 
+        }
+        Search-CSV @Parameters
     }
 })
 
-$wpf.Search.Add_Click({Search-CSV $wpf.Searchbar.Text $csv})
+$rows.Search.Add_Click({
+    $Parameters = @{
+        SearchText = $rows.Searchbar.Text
+        SearchFrom = $csv
+        InputAlias  = $context.InputAlias
+        OutputAlias = $context.OutputAlias
+        Alias       = $csvAlias 
+    }
+    Search-CSV @Parameters
+})
 
 # Set preview on cell change
-$wpf.CSVGrid.Add_SelectionChanged({
+$rows.CSVGrid.Add_SelectionChanged({
     # Expand <ColumnName> notation
     $Preview = Expand-Path $context.PreviewPath
     $Regex   = '(?<=<)(.+?)(?=>)'
     ($Preview | Select-String $Regex -AllMatches).Matches.Value.ForEach({
-        $Preview = $Preview.Replace("<$_>", $wpf.CSVGrid.SelectedItem.$_)
+        $Preview = $Preview.Replace("<$_>", $rows.CSVGrid.SelectedItem.$_)
     })
     
-    if (Test-Path $Preview) {$wpf.Preview.Source = $Preview}
+    if (Test-Path $Preview) {$rows.Preview.Source = $Preview}
 })
 
 # Copy preview
-$wpf.PreviewCopy.Add_Click({
-    $Preview = $wpf.Preview.Source.ToString()
+$rows.PreviewCopy.Add_Click({
+    $Preview = $rows.Preview.Source.ToString()
     $Preview = $Preview.Replace('file:///','')
 
     if (Test-Path $Preview) {

@@ -1,13 +1,12 @@
-function Search-CSV ($SearchText, $SearchFrom) {
+function Search-CSV ($SearchText, $SearchFrom, $InputAlias, $OutputAlias, $Alias) {
     # Initialize
     if ($SearchFrom.Count -eq 0) {
-        $wpf.Status.Text = 'Editing'
+        $rows.Status.Text = 'Editing'
         return
     }
-
-    $wpf.CSVGrid.ItemsSource = $null
-    $wpf.Preview.Source      = $null
-    $wpf.Status.Text         = 'Searching'
+    $rows.CSVGrid.ItemsSource = $null
+    $rows.Preview.Source      = $null
+    $rows.Status.Text         = 'Searching'
 
     # Parse SearchRules Text into [PSCustomObject] $Criteria
     $Criteria = [PSCustomObject] @{}
@@ -21,13 +20,13 @@ function Search-CSV ($SearchText, $SearchFrom) {
     })
 
     # Apply input alias
-    if ($context.InputAlias) {
+    if ($InputAlias) {
         $Criteria.PSObject.Properties.ForEach({
             $Header = $_.Name
             # Take into account of empty alias strings
-            $Count  = ($csvAlias.$Header | Where-Object {$_}).Count
+            $Count  = ($Alias.$Header | Where-Object {$_}).Count
             for ($i = 0; $i -lt $Count; $i += 2) {
-                $_.Value = $_.Value.Replace($csvAlias[$i+1].$Header, $csvAlias[$i].$Header)
+                $_.Value = $_.Value.Replace($Alias[$i+1].$Header, $Alias[$i].$Header)
             }
         })
     }
@@ -35,7 +34,7 @@ function Search-CSV ($SearchText, $SearchFrom) {
     # Search with new Powershell instance
     $Ps = [PowerShell]::Create().AddScript{
         function Update-GUI ([Action] $Action) {
-            $wpf.Rows.Dispatcher.Invoke($Action, 'ApplicationIdle')
+            $rows.Rows.Dispatcher.Invoke($Action, 'ApplicationIdle')
         }
 
         [Collections.ArrayList] $Search = @()
@@ -48,14 +47,14 @@ function Search-CSV ($SearchText, $SearchFrom) {
             }
         
             # Add entry; apply alias if OutputAlias is on 
-            if ($context.OutputAlias) {
+            if ($OutputAlias) {
                 $Row = $Entry.PSObject.Copy()
                 $Row.PSObject.Properties.ForEach({
                     $Header = $_.Name
                     # Take into account of empty alias strings
-                    $Count  = ($csvAlias.$Header | Where-Object {$_}).Count
+                    $Count  = ($Alias.$Header | Where-Object {$_}).Count
                     for ($i = 0; $i -lt $Count; $i += 2) {
-                        $_.Value = $_.Value.Replace($csvAlias[$i].$Header, $csvAlias[$i+1].$Header)
+                        $_.Value = $_.Value.Replace($Alias[$i].$Header, $Alias[$i+1].$Header)
                     }
                 })
                 $Search.Add($Row)
@@ -65,12 +64,12 @@ function Search-CSV ($SearchText, $SearchFrom) {
 
             # Show preliminary results
             if ($Search.Count -eq 25) {
-                Update-GUI {$wpf.CSVGrid.ItemsSource = $Search.PSObject.Copy()}
+                Update-GUI {$rows.CSVGrid.ItemsSource = $Search.PSObject.Copy()}
             }
         }
         # Show full results
-        Update-GUI {$wpf.CSVGrid.ItemsSource = $Search}
-        Update-GUI {$wpf.Status.Text = 'Ready'}
+        Update-GUI {$rows.CSVGrid.ItemsSource = $Search}
+        Update-GUI {$rows.Status.Text = 'Ready'}
     }
     
     # Assign runspace to instance
@@ -78,9 +77,8 @@ function Search-CSV ($SearchText, $SearchFrom) {
     $Ps.Runspace.ApartmentState = 'STA'
     $Ps.Runspace.ThreadOptions = 'ReuseThread'
     $Ps.Runspace.Open()
-    (Get-Variable wpf,SearchFrom,Criteria,csvAlias,context).ForEach({
+    (Get-Variable rows,SearchFrom,Criteria,Alias,OutputAlias).ForEach({
         $Ps.Runspace.SessionStateProxy.SetVariable($_.Name, $_.Value)
     })
     $Ps.BeginInvoke()
-    $wpf.TabControl.SelectedIndex = 1
 }

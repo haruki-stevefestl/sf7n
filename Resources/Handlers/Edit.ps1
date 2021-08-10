@@ -1,26 +1,37 @@
 # Enter edit mode
-$wpf.CSVGrid.Add_BeginningEdit({
-    $wpf.Status.Text = 'Editing'
-    $wpf.Mode.SelectedIndex = 1
-})
+$rows.CSVGrid.Add_BeginningEdit({$rows.Status.Text = 'Editing'})
 
 # Change rows (add/remove)
-$wpf.CSVGrid.Add_CellEditEnding({$wpf.Commit.IsEnabled = $true})
-$wpf.InsertLast.Add_Click({ Add-Row 'InsertLast'})
-$wpf.InsertAbove.Add_Click({Add-Row 'InsertAbove'})
-$wpf.InsertBelow.Add_Click({Add-Row 'InsertBelow'})
-$wpf.RemoveSelected.Add_Click({
-    $wpf.CSVGrid.SelectedItems.ForEach{$csv.Remove($_)}
-    $wpf.CSVGrid.ItemsSource = $csv
-    $wpf.CSVGrid.Items.Refresh()
-    $wpf.Commit.IsEnabled = [Boolean] $csv # Disable commit button if $csv is empty
+$rows.CSVGrid.Add_CellEditEnding({$rows.Commit.IsEnabled = $true})
+# function Add-Row ($Data, $Action, $At, $Count, $Format, $Header) {
+    # $Format and $Header only for $Action == 'InsertLast'
+
+$rows.InsertLast.Add_Click({
+    Add-Row $csv 'InsertLast' 0 $context.AppendCount $context.AppendFormat $csvHeader
+})
+
+$rows.InsertAbove.Add_Click({
+    $At = $csv.IndexOf($rows.CSVGrid.SelectedItem)
+    $Count = $rows.CSVGrid.SelectedItems.Count
+
+    if ($Count -gt 0) {Add-Row $csv 'InsertAbove' $At $Count}
+})
+
+$rows.InsertBelow.Add_Click({
+    $At = $csv.IndexOf($rows.CSVGrid.SelectedItem)
+    $Count = $rows.CSVGrid.SelectedItems.Count
+
+    if ($Count -gt 0) {Add-Row $csv 'InsertAbove' ($At+$Count) $Count}
+})
+
+$rows.RemoveSelected.Add_Click({
+    $rows.CSVGrid.SelectedItems.ForEach{$csv.Remove($_)}
+    $rows.CSVGrid.ItemsSource = $csv
+    $rows.CSVGrid.Items.Refresh()
 })
 
 # Commit CSV
-$wpf.Commit.Add_Click({
+$rows.Commit.Add_Click({
     Export-CustomCSV $csv $context.csvLocation
-    Import-CustomCSV $context.csvLocation
-
-    $wpf.Commit.IsEnabled = $false
-    Search-CSV $wpf.Searchbar.Text $csv
+    $rows.Commit.IsEnabled = $false
 })

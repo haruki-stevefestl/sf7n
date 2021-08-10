@@ -1,40 +1,38 @@
-function Add-Row ($Action) {
+function Add-Row ($Data, $Action, $At, $Count, $Format, $Header) {
+    # $Format and $Header only for $Action == 'InsertLast'
+
     # Prepare blank template for inserting
     $RowTemplate = [PSCustomObject] @{}
-    $csvHeader.Foreach({$RowTemplate | Add-Member NoteProperty $_ ''})
+    $Header.Foreach({$RowTemplate | Add-Member NoteProperty $_ ''})
     
     if ($Action -eq 'InsertLast') {
-        for ($i = 0; $i -lt $context.AppendCount; $i++) {
+        for ($i = 0; $i -lt $Count; $i++) {
             # Expand %x (legacy) and <x> (current) noation
             $ThisRow = $RowTemplate.PsObject.Copy()
-            $ThisRow.($csvHeader[0]) = $context.AppendFormat -replace
+            $ThisRow.($Header[0]) = $Format -replace
                 '%D|<D>', (Get-Date -Format yyyyMMdd) -replace
                 '%T|<T>', (Get-Date -Format HHmmss)   -replace
                 '%#|<#>', $I
-            if ($csv) {
-                $csv.Add($ThisRow)
+            if ($Data) {
+                $Data.Add($ThisRow)
             } else {
-                $script:csv = @($ThisRow)
+                [System.Collections.ArrayList] $Data = @($ThisRow)
             }
         }
-        $wpf.CSVGrid.ScrollIntoView($wpf.CSVGrid.Items[-1], $wpf.CSVGrid.Columns[0])
+        $rows.CSVGrid.ScrollIntoView($rows.CSVGrid.Items[-1], $rows.CSVGrid.Columns[0])
 
     } else {
         # InsertAbove/InsertBelow
-        $At = $csv.IndexOf($wpf.CSVGrid.SelectedItem)
-        $Count = $wpf.CSVGrid.SelectedItems.Count
-        if ($Action -eq 'InsertBelow') {$At += $Count}
-
         # Max & Min to prevent under/overflowing
         for ($i = 0; $i -lt $Count; $i++) {
-            $csv.Insert(
-                [Math]::Max(0, [Math]::Min($At,$csv.Count)),
+            $Data.Insert(
+                [Math]::Max(0, [Math]::Min($At,$Data.Count)),
                 $RowTemplate.PSObject.Copy()
             )
         }
     }
 
-    $wpf.Commit.IsEnabled = $true
-    $wpf.CSVGrid.ItemsSource = $csv
-    $wpf.CSVGrid.Items.Refresh()
+    $rows.Commit.IsEnabled = $true
+    $rows.CSVGrid.ItemsSource = $Data
+    $rows.CSVGrid.Items.Refresh()
 }

@@ -1,24 +1,26 @@
 function Import-CustomCSV ($ImportFrom) {
-    # Creates following variables:
-    #   - csv        [AList] Content
-    #   - csvHeader  [Array] Header of the CSV
-    #   - csvAlias   [Array] Aliases for CSV
+    # Returns the following variables:
+    #   - Csv        [AList] Content
+    #   - CsvHeader  [Array] Header of the CSV
+    #   - CsvAlias   [Array] Aliases for CSV
     Write-Log 'Load CSV'
     $ImportFrom = Expand-Path $ImportFrom
-    [Collections.ArrayList] $script:csv = Import-CSV $ImportFrom
+    [Collections.ArrayList] $Csv = Import-CSV $ImportFrom
 
     $Reader = [IO.StreamReader]::New($ImportFrom)
-    $script:csvHeader = $Reader.ReadLine() -replace '"' -split ','
+    $CsvHeader = $Reader.Readline() -replace '"' -split ','
 
-    $Alias = '.\Configurations\CSVAlias.csv'
-    if (Test-Path $Alias) {$script:csvAlias = Import-CSV $Alias}
+    $CsvAlias = '.\Configurations\CSVAlias.csv'
+    if (Test-Path $CsvAlias) {$CsvAlias = Import-CSV $CsvAlias}
 
-    if (!$csvHeader) {
+    if (!$CsvHeader) {
         throw (
             'The input CSV file is empty' + "`n" +
             'Please set a valid path within the configuration file.'
         )
     }
+
+    return $Csv, $CsvHeader, $CsvAlias
 }
 
 function Export-CustomCSV ($Data, $ExportTo) {
