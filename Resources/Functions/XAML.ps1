@@ -4,7 +4,7 @@ function New-GUI ($ImportFrom, $DataContext) {
     [Xml] $Xaml = Get-Content $ImportFrom
 
     Write-Log '  - Parse XAML'
-    $Xaml = Set-XAMLTheme $Xaml $context.Theme
+    # $Xaml = Set-XAMLTheme $Xaml $context.Theme
     $Form = [Windows.Markup.XamlReader]::Load([Xml.XmlNodeReader]::New($Xaml))
 
     # Populate $Hash with elements
@@ -13,7 +13,7 @@ function New-GUI ($ImportFrom, $DataContext) {
     $Xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]").Name.ForEach({
         if ($Hash.Keys -notcontains $_) {$Hash.Add($_, $Form.FindName($_))}
     })
-    $Hash.Rows.DataContext = $DataContext
+    # $Hash.Rows.DataContext = $DataContext
     return $Hash
 }
 
