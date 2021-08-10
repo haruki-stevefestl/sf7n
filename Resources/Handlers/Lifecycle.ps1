@@ -1,23 +1,55 @@
 # Work after splashscreen shows
-$wpf.Rows.Add_ContentRendered({
+$rows.Rows.Add_ContentRendered({
     # Minimize console
     if ($Host.Name -eq 'ConsoleHost') {
         powershell.exe -Window minimized -Command "#"
     }
 
     # Import CSV and generate columns
-    Import-Module .\Functions\Column.ps1 -Force
-    Initialize-Column
+    $script:csv, $script:csvHeader, $script:csvAlias =
+        Import-CustomCSV $context.csvLocation
+        
+    # Generate datagrid columns
+    Write-Log 'Add  datagrid columns'
+    $rows.CSVGrid.ItemsSource = $null
+    $rows.CSVGrid.Columns.Clear()
+    
+    $Format = '.\Configurations\Formatting.csv'
+    if (Test-Path $Format) {$Format = Import-CSV $Format}
+
+    $csvHeader.ForEach({
+        $Column = [Windows.Controls.DataGridTextColumn]::New()
+        $Column.Binding = [Windows.Data.Binding]::New($_)
+        $Column.Header  = $_
+        $Column.CellStyle = [Windows.Style]::New()
+
+        # Apply conditional formatting
+        $i = 0
+        while ($Format.$_[$i] -match '^\S+$') {
+            $Trigger = [Windows.DataTrigger]::New()
+            $Trigger.Binding = $Column.Binding
+            $Trigger.Value   = $Format.$_[$i]
+            $Trigger.Setters.Add([Windows.Setter]::New(
+                [Windows.Controls.DataGridCell]::BackgroundProperty,
+                [Windows.Media.BrushConverter]::New().ConvertFromString($Format.$_[$i+1])
+            ))
+            $Column.CellStyle.Triggers.Add($Trigger)
+            $i += 2
+        }
+
+        $rows.CSVGrid.Columns.Add($Column)
+    })
 
     Write-Log 'Load WinForms'
     Add-Type -AssemblyName System.Windows.Forms, System.Drawing 
 
-    Search-CSV $wpf.Searchbar.Text $csv
+    Search-CSV $rows.Searchbar.Text $csv
+    $rows.TabControl.SelectedIndex = 1
 })
 
 # Prompt on exit if unsaved
-$wpf.Rows.Add_Closing({
-    if ($wpf.Commit.IsEnabled) {
+$rows.Rows.Add_Closing({
+    if ($rows.Commit.IsEnabled) {
         $Dialog = New-Dialog 'Save changes before exiting?' 'YesNoCancel' 'Question'
         if ($Dialog -eq 'Cancel') {
             $_.Cancel = $true
