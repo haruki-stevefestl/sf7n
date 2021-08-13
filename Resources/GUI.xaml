@@ -35,16 +35,12 @@
             <Setter Property="FontSize" Value="14"/>
         </Style>
 
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="Transparent"/>
-        </Style>
-
         <Style x:Key="HideEditControl" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding ElementName=CSVGrid, Path=Items.Count}" Value="0">
+                <DataTrigger Binding="{Binding ElementName=Grid, Path=Items.Count}" Value="0">
                     <Setter Property="IsEnabled" Value="False"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding ElementName=CSVGrid, Path=SelectedItems.Count}" Value="0">
+                <DataTrigger Binding="{Binding ElementName=Grid, Path=SelectedItems.Count}" Value="0">
                     <Setter Property="IsEnabled" Value="False"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding ReadWrite}" Value="False">
@@ -108,7 +104,7 @@
                                         </Style>
                                     </CheckBox.Style>
                                 </CheckBox>
-                                <Button Name="InsertLast" Content="Append" Margin="0,0,4,0" IsEnabled="{Binding ReadWrite}"/>
+                                <Button Name="InsertLast" Content="Append" Margin="4,0,4,0" IsEnabled="{Binding ReadWrite}"/>
                                 <Button Name="InsertAbove" Content="Insert Above" Margin="4,0,4,0" Style="{StaticResource HideEditControl}"/>
                                 <Button Name="InsertBelow" Content="Insert Below" Margin="4,0,4,0" Style="{StaticResource HideEditControl}"/>
                                 <Button Name="RemoveSelected" Content="Remove Selection" Margin="4,0,4,0" Style="{StaticResource HideEditControl}"/>
@@ -119,35 +115,33 @@
 
                     <!-- Searching -->
                     <Grid Grid.Column="1" Height="56" VerticalAlignment="Top" Margin="0,0,16,0">
-                        <Grid Height="24">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*"/>
-                                <ColumnDefinition Width="3*"/>
-                                <ColumnDefinition Width="10*"/>
-                                <ColumnDefinition Width="4*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox Content=" Input Alias" IsChecked="{Binding InputAlias}" VerticalAlignment="Center"/>
-                            <CheckBox Grid.Column="1" Name="OutputAlias" Content=" Output Alias" IsChecked="{Binding OutputAlias}" VerticalAlignment="Center"/>
-                            <Grid Grid.Column="2">
-                                <TextBlock Foreground="{StaticResource Brush_Caption}" Background="White" VerticalAlignment="Center" Height="24" Padding="7,3">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=SearchBar, Path=Text}" Value="">
-                                                    <Setter Property="Text" Value="Filter by Header:Value"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <TextBox Name="SearchBar" AcceptsReturn="True" VerticalContentAlignment="Center" Height="24" Padding="4,0" Background="Transparent"/>
-                            </Grid>
-                            <Button Name="Search" Grid.Column="3" DockPanel.Dock="Right" Content="Filter" Height="24" Margin="8,0,0,0"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="4*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Content=" Input Alias" IsChecked="{Binding InputAlias}" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="1" Name="OutputAlias" Content=" Output Alias" IsChecked="{Binding OutputAlias}" VerticalAlignment="Center"/>
+                        <Grid Grid.Column="2">
+                            <TextBlock Foreground="{StaticResource Brush_Caption}" Background="White" Height="24" Padding="7,3">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=SearchBar, Path=Text}" Value="">
+                                                <Setter Property="Text" Value="Filter by Header:Value"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBox Name="SearchBar" AcceptsReturn="True" VerticalContentAlignment="Center" Height="24" Padding="4,0" Background="Transparent"/>
                         </Grid>
+                        <Button Name="Search" Grid.Column="3" DockPanel.Dock="Right" Content="Filter" Height="24" Margin="8,0,0,0"/>
                     </Grid>
                 </Grid>
 
-                <ProgressBar Name="ProgessBar" Grid.Row="1" Grid.ColumnSpan="2" Margin="-18,-8" Height="4" IsIndeterminate="True" VerticalAlignment="Top" Background="Transparent" BorderThickness="0">
+                <ProgressBar Name="ProgessBar" Margin="-18,4" Height="4" IsIndeterminate="True" VerticalAlignment="Bottom" Background="Transparent" BorderThickness="0">
                     <ProgressBar.Style>
                         <Style TargetType="ProgressBar">
                             <Style.Triggers>
@@ -160,12 +154,12 @@
                     </ProgressBar.Style>
                 </ProgressBar>
 
-                <!-- Empty CSV messages (left) -->
+                <!-- Empty Grid messages (left) -->
                 <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=CSVGrid, Path=Items.Count}" Value="0">
+                                <DataTrigger Binding="{Binding ElementName=Grid, Path=Items.Count}" Value="0">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -209,7 +203,7 @@
                 </StackPanel>
 
                 <!-- DataGrid (left) -->
-                <DataGrid Name="CSVGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,8,0,0" MinColumnWidth="48"
+                <DataGrid Name="Grid" Grid.Row="1" AutoGenerateColumns="False" Margin="0,8,0,0" MinColumnWidth="48"
                   Background="Transparent" Foreground="{StaticResource Brush_Foreground}" GridLinesVisibility="None" BorderThickness="0"
                   RowHeaderWidth="0" MinRowHeight="25" FrozenColumnCount="1" CanUserAddRows="False"
                   SelectionUnit="FullRow" EnableColumnVirtualization="True" EnableRowVirtualization="True">
@@ -280,20 +274,7 @@
                 </DataGrid>
 
                 <!-- Preview image (right) -->
-                <Button Name="PreviewCopy" Grid.Row="1" Grid.Column="1">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="Border" BorderThickness="0">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Button.Style>
+                <Button Name="PreviewCopy" Grid.Row="1" Grid.Column="1" BorderThickness="0" Background="Transparent">
                     <Grid>
                         <TextBlock Text="Click to copy image" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource Caption}"/>
                         <Image Name="Preview"/>
@@ -303,20 +284,8 @@
 
                 <!-- Status bar (bottom) -->
                 <DockPanel Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom">
-                    <TextBlock>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=ReadWrite, Path=IsChecked}" Value="True">
-                                        <Setter Property="Text" Value="Read-Write"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                                <Setter Property="Text" Value="Read-Only "/>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <TextBlock Text="{Binding ElementName=CSVGrid, Path=Items.Count, StringFormat='\{0\} item(s)'}" Style="{StaticResource Caption}" Margin="96,0,48,0"/>
-                    <TextBlock Text="{Binding ElementName=CSVGrid, Path=SelectedItems.Count, StringFormat='\{0\} selected'}" Style="{StaticResource Caption}"/>
+                    <TextBlock Text="{Binding ElementName=Grid, Path=Items.Count, StringFormat='\{0\} item(s)'}" Style="{StaticResource Caption}" Margin="0,0,48,0"/>
+                    <TextBlock Text="{Binding ElementName=Grid, Path=SelectedItems.Count, StringFormat='\{0\} selected'}" Style="{StaticResource Caption}"/>
                     <TextBlock Name="Status" Style="{StaticResource Caption}" HorizontalAlignment="Right"/>
                 </DockPanel>
             </Grid>
