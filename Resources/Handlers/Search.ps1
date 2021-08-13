@@ -8,8 +8,8 @@ $rows.Searchbar.Add_TextChanged({
         $Parameters = @{
             SearchText = $rows.Searchbar.Text
             SearchFrom = $csv
-            InputAlias  = $context.InputAlias
-            OutputAlias = $context.OutputAlias
+            InputAlias  = $config.InputAlias
+            OutputAlias = $config.OutputAlias
             Alias       = $csvAlias 
         }
         Search-CSV @Parameters
@@ -20,33 +20,38 @@ $rows.Search.Add_Click({
     $Parameters = @{
         SearchText = $rows.Searchbar.Text
         SearchFrom = $csv
-        InputAlias  = $context.InputAlias
-        OutputAlias = $context.OutputAlias
+        InputAlias  = $config.InputAlias
+        OutputAlias = $config.OutputAlias
         Alias       = $csvAlias 
     }
     Search-CSV @Parameters
 })
 
-# Set preview on cell change
-$rows.CSVGrid.Add_SelectionChanged({
+# Set preview on row change
+$rows.Grid.Add_SelectionChanged({
     # Expand <ColumnName> notation
-    $Preview = Expand-Path $context.PreviewPath
+    $Preview = Expand-Path $config.PreviewPath
     $Regex   = '(?<=<)(.+?)(?=>)'
-    ($Preview | Select-String $Regex -AllMatches).Matches.Value.ForEach({
-        $Preview = $Preview.Replace("<$_>", $rows.CSVGrid.SelectedItem.$_)
+    $Match   = $Preview | Select-String $Regex -AllMatches
+    $Match.Matches.Value.ForEach({
+        $Preview = $Preview.Replace("<$_>", $rows.Grid.SelectedItem.$_)
     })
-    
-    if (Test-Path $Preview) {$rows.Preview.Source = $Preview}
+
+    if (Test-Path $Preview) {
+        $rows.Preview.Source = $Preview
+    } else {
+        $rows.Preview.Source = $null
+    }
 })
 
 # Copy preview
 $rows.PreviewCopy.Add_Click({
-    $Preview = $rows.Preview.Source.ToString()
-    $Preview = $Preview.Replace('file:///','')
+    # ' '+ to prevent InvokeMethodOnNull exception
+    $Preview = ' '+$rows.Preview.Source
 
-    if (Test-Path $Preview) {
+    if ($Preview -match 'file:///') {
         [Windows.Forms.Clipboard]::SetImage([Drawing.Image]::FromFile(
-            $Preview
+            $Preview.Replace('file:///','')
         ))
     }
 })

@@ -4,9 +4,9 @@ function Search-CSV ($SearchText, $SearchFrom, $InputAlias, $OutputAlias, $Alias
         $rows.Status.Text = 'Editing'
         return
     }
-    $rows.CSVGrid.ItemsSource = $null
-    $rows.Preview.Source      = $null
-    $rows.Status.Text         = 'Searching'
+    $rows.Grid.ItemsSource = $null
+    $rows.Preview.Source   = $null
+    $rows.Status.Text      = 'Searching'
 
     # Parse SearchRules Text into [PSCustomObject] $Criteria
     $Criteria = [PSCustomObject] @{}
@@ -64,11 +64,11 @@ function Search-CSV ($SearchText, $SearchFrom, $InputAlias, $OutputAlias, $Alias
 
             # Show preliminary results
             if ($Search.Count -eq 25) {
-                Update-GUI {$rows.CSVGrid.ItemsSource = $Search.PSObject.Copy()}
+                Update-GUI {$rows.Grid.ItemsSource = $Search.PSObject.Copy()}
             }
         }
         # Show full results
-        Update-GUI {$rows.CSVGrid.ItemsSource = $Search}
+        Update-GUI {$rows.Grid.ItemsSource = $Search}
         Update-GUI {$rows.Status.Text = 'Ready'}
     }
     

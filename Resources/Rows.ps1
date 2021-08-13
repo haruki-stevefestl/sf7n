@@ -1,7 +1,5 @@
 #Requires -Version 3
-# Base variables & functions
 $startTime = Get-Date
-Add-Type -AssemblyName PresentationFramework
 
 function Write-Log ($Log) {
     $TimeDiff = ((Get-Date)-$startTime).TotalMilliseconds
@@ -13,40 +11,28 @@ function New-Dialog ($Message = '', $Option = 'OK', $Icon = 'Information') {
 }
 
 # Error handling
-# trap {
-#     throw $_
-#     New-Dialog "Error: $_`n`nClick OK to exit" 'OK' 'Error'
-#     if ($rows) {$rows.Rows.Close()} # IF to prevent error before GUI shows
-#     exit
-# }
+trap {
+    New-Dialog "Error: $_`n`nClick OK to exit" 'OK' 'Error'
+    if ($rows) {$rows.Rows.Close()} # IF to prevent error before GUI shows
+    exit
+}
 
-# Defaults for Rows
+# Defaults 
 Write-Log 'Rows 1.7'
-Write-Log '-------------------------'
 Write-Log 'Set  defaults parameters'
 $PSDefaultParameterValues = @{'*:Encoding' = 'UTF8'}
 $script:baseDir = $PSScriptRoot
 Set-Location $baseDir
 Get-ChildItem *.ps1 -Recurse | Unblock-File
+Add-Type -AssemblyName PresentationFramework
 
 # XAML & GUI
 Import-Module .\Functions\XAML.ps1 -Force
-$script:rows = New-GUI .\GUI.xaml $context
+$script:rows = New-GUI .\GUI.xaml $config
 
-# Configurations & DataContext
-Import-Module .\Functions\DataContext.ps1 -Force
-$script:context = New-DataContext .\Configurations\General.ini
-$rows.Rows.DataContext = $context
-
-# GUI Modules
+# Modules
 Write-Log 'Load modules'
-foreach ($Module in 'Search','Edit') {
-    Import-Module .\Functions\$Module.ps1 -Force
-    Import-Module .\Handlers\$Module.ps1 -Force
-}
-Import-Module .\Functions\IO.ps1 -Force
-Import-Module .\Handlers\Lifecycle.ps1 -Force
-Remove-Variable Module
+Get-ChildItem *.ps1 -Recurse -Exclude Rows.ps1 | Import-Module -Force
 
 # Display GUI
 # Execution goes to Handlers\Lifecycle.ps1
