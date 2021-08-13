@@ -10,7 +10,6 @@ function New-DataContext ($ImportFrom) {
     return ([PSCustomObject] @{
         csvLocation  = $Key.csvLocation
         PreviewPath  = $Key.PreviewPath
-        Theme        = $Key.Theme
         AppendFormat = $Key.AppendFormat
         AppendCount  = $Key.AppendCount
         InputAlias   = $Key.InputAlias  -ieq 'true'

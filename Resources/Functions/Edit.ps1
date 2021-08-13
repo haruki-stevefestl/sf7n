@@ -1,25 +1,25 @@
 function Add-Row ($Data, $Action, $At, $Count, $Format, $Header) {
     # $Format and $Header only for $Action == 'InsertLast'
-
     # Prepare blank template for inserting
     $RowTemplate = [PSCustomObject] @{}
     $Header.Foreach({$RowTemplate | Add-Member NoteProperty $_ ''})
     
     if ($Action -eq 'InsertLast') {
         for ($i = 0; $i -lt $Count; $i++) {
-            # Expand %x (legacy) and <x> (current) noation
+            # Expand <x> noation
+            $Now = Get-Date
             $ThisRow = $RowTemplate.PsObject.Copy()
             $ThisRow.($Header[0]) = $Format -replace
-                '%D|<D>', (Get-Date -Format yyyyMMdd) -replace
-                '%T|<T>', (Get-Date -Format HHmmss)   -replace
-                '%#|<#>', $I
+                '<D>', $Now.ToString('yyyyMMdd') -replace
+                '<T>', $Now.ToString('HHmmss')   -replace
+                '<#>', $I
             if ($Data) {
                 $Data.Add($ThisRow)
             } else {
-                [System.Collections.ArrayList] $Data = @($ThisRow)
+                [Collections.ArrayList] $Data = @($ThisRow)
             }
         }
-        $rows.CSVGrid.ScrollIntoView($rows.CSVGrid.Items[-1], $rows.CSVGrid.Columns[0])
+        $rows.Grid.ScrollIntoView($rows.Grid.Items[-1], $rows.Grid.Columns[0])
 
     } else {
         # InsertAbove/InsertBelow
@@ -33,6 +33,6 @@ function Add-Row ($Data, $Action, $At, $Count, $Format, $Header) {
     }
 
     $rows.Commit.IsEnabled = $true
-    $rows.CSVGrid.ItemsSource = $Data
-    $rows.CSVGrid.Items.Refresh()
+    $rows.Grid.ItemsSource = $Data
+    $rows.Grid.Items.Refresh()
 }
