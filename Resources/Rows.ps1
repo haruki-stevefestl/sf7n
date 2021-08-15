@@ -1,9 +1,7 @@
 #Requires -Version 3
-$startTime = Get-Date
 
 function Write-Log ($Log) {
-    $TimeDiff = ((Get-Date)-$startTime).TotalMilliseconds
-    Write-Output ("{0,-8:0} {1}" -F $TimeDiff,$Log) | Out-Host
+    Write-Output ("[$(Get-Date -Format HH:mm:ss.ff)]  $Log") | Out-Host
 }
 
 function New-Dialog ($Message = '', $Option = 'OK', $Icon = 'Information') {
@@ -19,8 +17,9 @@ trap {
 
 # Defaults 
 Write-Log 'Rows 1.7'
-Write-Log 'Set  defaults parameters'
+Write-Log 'Set  defaults'
 $PSDefaultParameterValues = @{'*:Encoding' = 'UTF8'}
+$script:undo    = $null
 $script:baseDir = $PSScriptRoot
 Set-Location $baseDir
 Get-ChildItem *.ps1 -Recurse | Unblock-File
@@ -28,7 +27,7 @@ Add-Type -AssemblyName PresentationFramework
 
 # XAML & GUI
 Import-Module .\Functions\XAML.ps1 -Force
-$script:rows = New-GUI .\GUI.xaml $config
+$script:rows = New-GUI .\GUI.xaml
 
 # Modules
 Write-Log 'Load modules'
