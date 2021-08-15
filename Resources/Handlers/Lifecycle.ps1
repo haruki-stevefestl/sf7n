@@ -65,9 +65,8 @@ $rows.Rows.Add_Closing({
 
     # Cleanup
     Write-Log 'Cleanup'
-    Remove-Variable baseDir,context,rows,startTime,
+    Remove-Variable baseDir,config,rows,undo,
         csvAlias,csvHeader,csv -Scope Script -Force
 
-    Remove-Module Config,DataContext,Edit,Column,IO,
-        Lifecycle,Search,XAML -Force
+    Remove-Module DataContext,Edit,IO,Lifecycle,Search,XAML -Force
 })

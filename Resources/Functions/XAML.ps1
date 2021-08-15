@@ -1,4 +1,4 @@
-function New-GUI ($ImportFrom, $DataContext) {
+function New-GUI ($ImportFrom) {
     Write-Log 'New  GUI'
     Write-Log '  - Read XAML'
     [Xml] $Xaml = Get-Content $ImportFrom
