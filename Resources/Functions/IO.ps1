@@ -3,9 +3,11 @@ function Import-CustomCSV ($ImportFrom) {
     #   - Csv        [AList] Content
     #   - CsvHeader  [Array] Header of the CSV
     #   - CsvAlias   [Array] Aliases for CSV
-    Write-Log 'Load CSV'
+    Write-Log 'Get  CSV'
     $ImportFrom = Expand-Path $ImportFrom
-    [Collections.ArrayList] $Csv = Import-CSV $ImportFrom
+
+    # @() because https://github.com/PowerShell/PowerShell/issues/2208
+    [Collections.ArrayList] $Csv = @(Import-CSV $ImportFrom)
 
     $Reader = [IO.StreamReader]::New($ImportFrom)
     $CsvHeader = $Reader.Readline() -replace '"' -split ','
