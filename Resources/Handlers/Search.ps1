@@ -1,36 +1,57 @@
 # Start search
-$wpf.Searchbar.Add_TextChanged({
-    if ($wpf.Searchbar.Text -match '[\r\n]') {
-        $PrevCursor = $wpf.Searchbar.SelectionStart - 2
-        $wpf.Searchbar.Text = $wpf.Searchbar.Text -replace '[\r\n]'
-        $wpf.Searchbar.SelectionStart = $PrevCursor
-
-        Search-CSV $wpf.Searchbar.Text $csv
+$rows.Searchbar.Add_TextChanged({
+    if ($rows.Searchbar.Text -match '[\r\n]') {
+        $PrevCursor = $rows.Searchbar.SelectionStart - 2
+        $rows.Searchbar.Text = $rows.Searchbar.Text -replace '[\r\n]'
+        $rows.Searchbar.SelectionStart = $PrevCursor
+        
+        $Parameters = @{
+            SearchText = $rows.Searchbar.Text
+            SearchFrom = $csv
+            InputAlias  = $config.InputAlias
+            OutputAlias = $config.OutputAlias
+            Alias       = $csvAlias 
+        }
+        Search-CSV @Parameters
     }
 })
 
-$wpf.Search.Add_Click({Search-CSV $wpf.Searchbar.Text $csv})
+$rows.Search.Add_Click({
+    $Parameters = @{
+        SearchText = $rows.Searchbar.Text
+        SearchFrom = $csv
+        InputAlias  = $config.InputAlias
+        OutputAlias = $config.OutputAlias
+        Alias       = $csvAlias 
+    }
+    Search-CSV @Parameters
+})
 
-# Set preview on cell change
-$wpf.CSVGrid.Add_SelectionChanged({
+# Set preview on row change
+$rows.Grid.Add_SelectionChanged({
     # Expand <ColumnName> notation
-    $Preview = Expand-Path $context.PreviewPath
+    $Preview = Expand-Path $config.PreviewPath
     $Regex   = '(?<=<)(.+?)(?=>)'
-    ($Preview | Select-String $Regex -AllMatches).Matches.Value.ForEach({
-        $Preview = $Preview.Replace("<$_>", $wpf.CSVGrid.SelectedItem.$_)
+    $Match   = $Preview | Select-String $Regex -AllMatches
+    $Match.Matches.Value.ForEach({
+        $Preview = $Preview.Replace("<$_>", $rows.Grid.SelectedItem.$_)
     })
-    
-    if (Test-Path $Preview) {$wpf.Preview.Source = $Preview}
+
+    if (Test-Path $Preview) {
+        $rows.Preview.Source = $Preview
+    } else {
+        $rows.Preview.Source = $null
+    }
 })
 
 # Copy preview
-$wpf.PreviewCopy.Add_Click({
-    $Preview = $wpf.Preview.Source.ToString()
-    $Preview = $Preview.Replace('file:///','')
+$rows.PreviewCopy.Add_Click({
+    # ' '+ to prevent InvokeMethodOnNull exception
+    $Preview = ' '+$rows.Preview.Source
 
-    if (Test-Path $Preview) {
+    if ($Preview -match 'file:///') {
         [Windows.Forms.Clipboard]::SetImage([Drawing.Image]::FromFile(
-            $Preview
+            $Preview.Replace('file:///','')
         ))
     }
 })
