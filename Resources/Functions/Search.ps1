@@ -39,12 +39,10 @@ function Search-CSV ($SearchText, $SearchFrom, $InputAlias, $OutputAlias, $Alias
 
         [Collections.ArrayList] $Search = @()
         foreach ($Entry in $SearchFrom) {
-            if ('' -ne $Criteria) {
-                # If notMatch, goto next iteration
-                $Criteria.PSObject.Properties.ForEach({
-                    if ($Entry.($_.Name) -notmatch $_.Value) {continue}
-                })
-            }
+            # If notMatch, goto next iteration
+            $Criteria.PSObject.Properties.ForEach({
+                if ($Entry.($_.Name) -notmatch $_.Value) {continue}
+            })
         
             # Add entry; apply alias if OutputAlias is on 
             if ($OutputAlias) {

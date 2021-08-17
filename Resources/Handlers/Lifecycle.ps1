@@ -47,7 +47,7 @@ $rows.Rows.Add_ContentRendered({
     Write-Log 'Load WinForms'
     Add-Type -AssemblyName System.Windows.Forms, System.Drawing 
 
-    Search-CSV $rows.Searchbar.Text $csv
+    Search-CSV '' $csv
     $rows.TabControl.SelectedIndex = 1
     [GC]::Collect()
 })
@@ -65,6 +65,7 @@ $rows.Rows.Add_Closing({
 
     # Cleanup
     Write-Log 'Cleanup'
+    $script:undo = $null
     Remove-Variable baseDir,config,rows,undo,
         csvAlias,csvHeader,csv -Scope Script -Force
 

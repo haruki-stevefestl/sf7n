@@ -19,7 +19,6 @@ trap {
 Write-Log 'Rows 1.7'
 Write-Log 'Set  defaults'
 $PSDefaultParameterValues = @{'*:Encoding' = 'UTF8'}
-$script:undo    = $null
 $script:baseDir = $PSScriptRoot
 Set-Location $baseDir
 Get-ChildItem *.ps1 -Recurse | Unblock-File

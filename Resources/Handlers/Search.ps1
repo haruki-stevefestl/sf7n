@@ -16,6 +16,17 @@ $rows.Searchbar.Add_TextChanged({
     }
 })
 
+$rows.OutputAlias.Add_Click({
+    $Parameters = @{
+        SearchText = $rows.Searchbar.Text
+        SearchFrom = $csv
+        InputAlias  = $config.InputAlias
+        OutputAlias = $config.OutputAlias
+        Alias       = $csvAlias 
+    }
+    Search-CSV @Parameters
+})
+
 $rows.Search.Add_Click({
     $Parameters = @{
         SearchText = $rows.Searchbar.Text
