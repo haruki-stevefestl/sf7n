@@ -25,20 +25,22 @@ $rows.Rows.Add_ContentRendered({
         $Column = [Windows.Controls.DataGridTextColumn]::New()
         $Column.Binding = [Windows.Data.Binding]::New($_)
         $Column.Header  = $_
-        $Column.CellStyle = [Windows.Style]::New()
 
         # Apply conditional formatting
-        $i = 0
-        while ($Format.$_[$i] -match '^\S+$') {
-            $Trigger = [Windows.DataTrigger]::New()
-            $Trigger.Binding = $Column.Binding
-            $Trigger.Value   = $Format.$_[$i]
-            $Trigger.Setters.Add([Windows.Setter]::New(
-                [Windows.Controls.DataGridCell]::BackgroundProperty,
-                [Windows.Media.BrushConverter]::New().ConvertFromString($Format.$_[$i+1])
-            ))
-            $Column.CellStyle.Triggers.Add($Trigger)
-            $i += 2
+        if ($Format -is [Array]) {
+            $Column.CellStyle = [Windows.Style]::New()
+            $i = 0
+            while ($Format.$_[$i] -match '^\S+$') {
+                $Trigger = [Windows.DataTrigger]::New()
+                $Trigger.Binding = $Column.Binding
+                $Trigger.Value   = $Format.$_[$i]
+                $Trigger.Setters.Add([Windows.Setter]::New(
+                    [Windows.Controls.DataGridCell]::BackgroundProperty,
+                    [Windows.Media.BrushConverter]::New().ConvertFromString($Format.$_[$i+1])
+                ))
+                $Column.CellStyle.Triggers.Add($Trigger)
+                $i += 2
+            }
         }
 
         $rows.Grid.Columns.Add($Column)
