@@ -14,14 +14,10 @@ $rows.Grid.Add_RowEditEnding({
         OldRow    = $oldRow
         Count     = 1
     }
-    # $script:b = $Args[1]
-
-    if ($Args[1].EditAction -eq 'Commit') {
-        Write-Log $Args[1].Cancel
-        [Collections.ArrayList] $script:undo = Add-Undo @Parameters
-        $rows.Undo.IsEnabled = $true
-        $rows.Commit.IsEnabled = $true
-    }
+    
+    [Collections.ArrayList] $script:undo = Add-Undo @Parameters
+    $rows.Undo.IsEnabled = $true
+    $rows.Commit.IsEnabled = $true
 })
 
 $rows.Undo.Add_Click({

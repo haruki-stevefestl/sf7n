@@ -5,9 +5,8 @@ $rows.Rows.Add_ContentRendered({
         powershell.exe -Window Minimized '#'
     }
 
-    # Configurations & DataContext
+    # Configurations
     $script:config = New-DataContext .\Configurations\General.ini
-    $rows.Rows.DataContext = $config
 
     # Import CSV and generate columns
     $script:csv, $script:csvHeader, $script:csvAlias =
@@ -20,6 +19,9 @@ $rows.Rows.Add_ContentRendered({
     
     $Format = '.\Configurations\Formatting.csv'
     if (Test-Path $Format) {$Format = Import-CSV $Format}
+
+    # En/disable InputAlias & OutputAlias button
+    if ($Format -isnot [Array]) {$config.HasAlias = 'Collapsed'}
 
     $csvHeader.ForEach({
         $Column = [Windows.Controls.DataGridTextColumn]::New()
@@ -36,19 +38,21 @@ $rows.Rows.Add_ContentRendered({
                 $Trigger.Value   = $Format.$_[$i]
                 $Trigger.Setters.Add([Windows.Setter]::New(
                     [Windows.Controls.DataGridCell]::BackgroundProperty,
-                    [Windows.Media.BrushConverter]::New().ConvertFromString($Format.$_[$i+1])
+                    [Windows.Media.BrushConverter]::New().ConvertFrom($Format.$_[$i+1])
                 ))
                 $Column.CellStyle.Triggers.Add($Trigger)
                 $i += 2
             }
         }
-
         $rows.Grid.Columns.Add($Column)
     })
+
 
     Write-Log 'Load WinForms'
     Add-Type -AssemblyName System.Windows.Forms, System.Drawing 
 
+    # Finalize UI
+    $rows.Rows.DataContext = $config
     Search-CSV '' $csv
     $rows.TabControl.SelectedIndex = 1
     [GC]::Collect()
@@ -68,8 +72,8 @@ $rows.Rows.Add_Closing({
     # Cleanup
     Write-Log 'Cleanup'
     $script:undo = $null
-    Remove-Variable baseDir,config,rows,undo,
-        csvAlias,csvHeader,csv -Scope Script -Force
+    # Remove-Variable baseDir,config,rows,undo,
+    #     csvAlias,csvHeader,csv -Scope Script -Force
 
-    Remove-Module DataContext,Edit,IO,Lifecycle,Search,XAML -Force
+    # Remove-Module DataContext,Edit,IO,Lifecycle,Search,XAML -Force
 })

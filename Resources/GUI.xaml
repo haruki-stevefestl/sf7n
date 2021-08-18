@@ -115,16 +115,13 @@
                     </Expander>
 
                     <!-- Searching -->
-                    <Grid Grid.Column="1" Height="56" VerticalAlignment="Top" Margin="0,0,16,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" MaxWidth="256"/>
-                            <ColumnDefinition Width="*" MaxWidth="256"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="2*" MaxWidth="384"/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Content=" Input Alias" IsChecked="{Binding InputAlias}" VerticalAlignment="Center"/>
-                        <CheckBox Grid.Column="1" Name="OutputAlias" Content=" Output Alias" IsChecked="{Binding OutputAlias}" VerticalAlignment="Center"/>
-                        <Grid Grid.Column="2">
+                    <DockPanel Grid.Column="1" Height="56" Margin="0,0,16,0" VerticalAlignment="Top">
+                        <Button Name="Search" Grid.Column="3" DockPanel.Dock="Right" Content="Filter" Height="24" Width="384"/>
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding HasAlias}">
+                            <CheckBox Content=" Input Alias" IsChecked="{Binding InputAlias}" VerticalAlignment="Center"/>
+                            <CheckBox Grid.Column="1" Name="OutputAlias" Content=" Output Alias" IsChecked="{Binding OutputAlias}" VerticalAlignment="Center" Margin="48,0"/>
+                        </StackPanel>
+                        <Grid Grid.Column="2" Margin="8,0">
                             <TextBlock Foreground="{StaticResource Brush_Caption}" Background="White" Height="24" Padding="7,3">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -138,8 +135,7 @@
                             </TextBlock>
                             <TextBox Name="SearchBar" AcceptsReturn="True" VerticalContentAlignment="Center" Height="24" Padding="4,0" Background="Transparent"/>
                         </Grid>
-                        <Button Name="Search" Grid.Column="3" DockPanel.Dock="Right" Content="Filter" Height="24" Margin="8,0,0,0"/>
-                    </Grid>
+                    </DockPanel>
                 </Grid>
 
                 <ProgressBar Name="ProgessBar" Margin="-18,4" Height="4" IsIndeterminate="True" VerticalAlignment="Bottom" Background="Transparent" BorderThickness="0">
