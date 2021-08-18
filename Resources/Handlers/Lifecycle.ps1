@@ -11,6 +11,9 @@ $rows.Rows.Add_ContentRendered({
     # Import CSV and generate columns
     $script:csv, $script:csvHeader, $script:csvAlias =
         Import-CustomCSV $config.csvLocation
+
+    # En/disable InputAlias & OutputAlias button
+        if ($csvAlias -isnot [Array]) {$config.HasAlias = 'Collapsed'}
         
     # Generate datagrid columns
     Write-Log 'Add  datagrid columns'
@@ -19,9 +22,6 @@ $rows.Rows.Add_ContentRendered({
     
     $Format = '.\Configurations\Formatting.csv'
     if (Test-Path $Format) {$Format = Import-CSV $Format}
-
-    # En/disable InputAlias & OutputAlias button
-    if ($Format -isnot [Array]) {$config.HasAlias = 'Collapsed'}
 
     $csvHeader.ForEach({
         $Column = [Windows.Controls.DataGridTextColumn]::New()
