@@ -1,5 +1,6 @@
 # Start search
 $rows.Searchbar.Add_TextChanged({
+    # Search on ENTER pressed
     if ($rows.Searchbar.Text -match '[\r\n]') {
         $PrevCursor = $rows.Searchbar.SelectionStart - 2
         $rows.Searchbar.Text = $rows.Searchbar.Text -replace '[\r\n]'
@@ -16,6 +17,7 @@ $rows.Searchbar.Add_TextChanged({
     }
 })
 
+# Search on OutputAlias changed
 $rows.OutputAlias.Add_Click({
     $Parameters = @{
         SearchText = $rows.Searchbar.Text
@@ -27,6 +29,7 @@ $rows.OutputAlias.Add_Click({
     Search-CSV @Parameters
 })
 
+# Search on search button clicked
 $rows.Search.Add_Click({
     $Parameters = @{
         SearchText = $rows.Searchbar.Text
@@ -57,12 +60,9 @@ $rows.Grid.Add_SelectionChanged({
 
 # Copy preview
 $rows.PreviewCopy.Add_Click({
-    # ' '+ to prevent InvokeMethodOnNull exception
-    $Preview = ' '+$rows.Preview.Source
-
-    if ($Preview -match 'file:///') {
+    if ($rows.Preview.Source -match 'file:///') {
         [Windows.Forms.Clipboard]::SetImage([Drawing.Image]::FromFile(
-            $Preview.Replace('file:///','')
+            $rows.Preview.Source.ToString().Replace('file:///','')
         ))
     }
 })
