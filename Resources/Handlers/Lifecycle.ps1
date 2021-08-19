@@ -54,7 +54,7 @@ $rows.Rows.Add_ContentRendered({
     # Finalize UI
     $rows.Rows.DataContext = $config
     Search-CSV '' $csv
-    $rows.TabControl.SelectedIndex = 1
+    $rows.Splashscreen.Visibility = 'Collapsed'
     [GC]::Collect()
 })
 
@@ -72,8 +72,8 @@ $rows.Rows.Add_Closing({
     # Cleanup
     Write-Log 'Cleanup'
     $script:undo = $null
-    # Remove-Variable baseDir,config,rows,undo,
-    #     csvAlias,csvHeader,csv -Scope Script -Force
+    Remove-Variable baseDir,config,rows,undo,
+        csvAlias,csvHeader,csv -Scope Script -Force
 
-    # Remove-Module DataContext,Edit,IO,Lifecycle,Search,XAML -Force
+    Remove-Module DataContext,Edit,IO,Lifecycle,Search,XAML -Force
 })

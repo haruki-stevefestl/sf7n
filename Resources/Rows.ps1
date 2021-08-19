@@ -35,4 +35,5 @@ Get-ChildItem *.ps1 -Recurse -Exclude Rows.ps1 | Import-Module -Force
 # Display GUI
 # Execution goes to Handlers\Lifecycle.ps1
 Write-Log '-------------------------'
+$rows.Splashscreen.Visibility = 'Visible'
 [Void] $rows.Rows.ShowDialog()

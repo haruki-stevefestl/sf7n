@@ -61,7 +61,7 @@ function Search-CSV ($SearchText, $SearchFrom, $InputAlias, $OutputAlias, $Alias
             }
 
             # Show preliminary results
-            if ($Search.Count -eq 25) {
+            if ($Search.Count -eq 100) {
                 Update-GUI {$rows.Grid.ItemsSource = $Search.PSObject.Copy()}
             }
         }
