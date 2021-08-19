@@ -1,8 +1,16 @@
+# Wrapper to reinitialize grid
 function Update-Grid {
+    $rows.Rows.Title = 'Rows  -  Unsaved changes'
     $rows.Undo.IsEnabled   = $true
     $rows.Commit.IsEnabled = $true
     $rows.Grid.ItemsSource = @($csv)
     $rows.Grid.Items.Refresh()
+}
+
+# Do not allow Undo and Commit buttons if
+# there are no undo steps or ReadWrite is off 
+function Get-CanEnableEditing ($UndoStack, $ReadWrite) {
+    return [Bool] ($UndoStack) -and $ReadWrite
 }
 
 function Add-Undo ($UndoStack, $Data, $Operation, $At, $OldRow, $Count) {

@@ -1,10 +1,17 @@
+# Prevent Undo and Commit if ReadWrite is off
+$rows.ReadWrite.Add_Click({
+    $rows.Undo.IsEnabled = 
+        $rows.Commit.IsEnabled =
+            Get-CanEnableEditing $undo $config.ReadWrite
+})
+
 # Enter edit mode
 $rows.Grid.Add_BeginningEdit({
     $rows.Status.Text = 'Editing'
     $script:oldRow = $Args[1].Row.Item.PSObject.Copy()
 })
 
-# Change rows (add/change/remove)
+# Commit change into $undo
 $rows.Grid.Add_RowEditEnding({
     $Parameters = @{
         UndoStack = $undo
@@ -15,14 +22,17 @@ $rows.Grid.Add_RowEditEnding({
         Count     = 1
     }
     
+    $rows.Rows.Title = 'Rows  -  Unsaved changes'
     [Collections.ArrayList] $script:undo = Add-Undo @Parameters
-    $rows.Undo.IsEnabled = $true
-    $rows.Commit.IsEnabled = $true
+    $rows.Undo.IsEnabled = 
+        $rows.Commit.IsEnabled =
+            Get-CanEnableEditing $undo $config.ReadWrite
 })
 
+# Each function below corresponds to a button in the GUI
 $rows.Undo.Add_Click({
     $script:undo, $script:csv = Invoke-Undo $undo $csv
-    $rows.Undo.IsEnabled = [Boolean] $undo
+    $rows.Undo.IsEnabled = Get-CanEnableEditing $undo $config.ReadWrite
     Update-Grid
 })
 
@@ -49,7 +59,6 @@ $rows.InsertBelow.Add_Click({
 
 $rows.RemoveSelected.Add_Click({
     $rows.Grid.SelectedItems.ForEach({
-        # Process undo
         $Parameters = @{
             UndoStack = $undo
             Data      = $csv
@@ -67,4 +76,5 @@ $rows.RemoveSelected.Add_Click({
 $rows.Commit.Add_Click({
     Export-CustomCSV $csv $config.csvLocation
     $rows.Commit.IsEnabled = $false
+    $rows.Rows.Title = 'Rows'
 })

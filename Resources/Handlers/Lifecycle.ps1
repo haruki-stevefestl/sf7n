@@ -60,10 +60,12 @@ $rows.Rows.Add_ContentRendered({
 
 # Prompt on exit if unsaved
 $rows.Rows.Add_Closing({
-    if ($rows.Commit.IsEnabled) {
+    if ($rows.Rows.Title -eq 'Rows  -  Unsaved changes') {
         $Dialog = New-Dialog 'Save changes before exiting?' 'YesNoCancel' 'Question'
         if ($Dialog -eq 'Cancel') {
             $_.Cancel = $true
+            return
+            
         } elseif ($Dialog -eq 'Yes') {
             Export-CustomCSV $config.csvLocation
         }
