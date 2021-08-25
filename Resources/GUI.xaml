@@ -34,7 +34,7 @@
             <Setter Property="FontSize" Value="14"/>
         </Style>
 
-        <Style x:Key="HideEditControl" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Style x:Key="HideEditControl" TargetType="Button">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ElementName=Grid, Path=Items.Count}" Value="0">
                     <Setter Property="IsEnabled" Value="False"/>
@@ -79,7 +79,7 @@
                         </Style.Triggers>
                     </Style>
                 </Expander.Style>
-                <UniformGrid Columns="7" Height="24" Margin="55,24,16,16">
+                <UniformGrid Columns="8" Height="24" Margin="55,24,16,16">
                     <CheckBox Name="ReadWrite" Content=" Editing" VerticalAlignment="Center">
                         <CheckBox.Style>
                             <Style TargetType="CheckBox">
@@ -94,11 +94,12 @@
                             </Style>
                         </CheckBox.Style>
                     </CheckBox>
-                    <Button Name="Undo" Content="Undo" Margin="4,0,4,0" Style="{StaticResource HideEditControl}" IsEnabled="False"/>
-                    <Button Name="InsertLast" Content="Append" Margin="4,0,4,0" IsEnabled="{Binding ReadWrite}"/>
-                    <Button Name="InsertAbove" Content="Insert Above" Margin="4,0,4,0" Style="{StaticResource HideEditControl}"/>
-                    <Button Name="InsertBelow" Content="Insert Below" Margin="4,0,4,0" Style="{StaticResource HideEditControl}"/>
-                    <Button Name="RemoveSelected" Content="Remove Selection" Margin="4,0,4,0" Style="{StaticResource HideEditControl}"/>
+                    <CheckBox Content=" Template Rows" IsChecked="{Binding IsTemplate}" Margin="4,0" VerticalAlignment="Center" IsEnabled="{Binding ElementName=ReadWrite, Path=IsEnabled}"/>
+                    <Button Name="Undo" Content="Undo" Margin="4,0" Style="{StaticResource HideEditControl}" IsEnabled="False"/>
+                    <Button Name="InsertLast" Content="Append" Margin="4,0" IsEnabled="{Binding ReadWrite}"/>
+                    <Button Name="InsertAbove" Content="Insert Above" Margin="4,0" Style="{StaticResource HideEditControl}"/>
+                    <Button Name="InsertBelow" Content="Insert Below" Margin="4,0" Style="{StaticResource HideEditControl}"/>
+                    <Button Name="RemoveSelected" Content="Remove Selection" Margin="4,0" Style="{StaticResource HideEditControl}"/>
                     <Button Name="Commit" Content="Export to File" Margin="4,0,0,0" IsEnabled="False"/>
                 </UniformGrid>
             </Expander>

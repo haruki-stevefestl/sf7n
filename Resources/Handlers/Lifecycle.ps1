@@ -13,7 +13,7 @@ $rows.Rows.Add_ContentRendered({
         Import-CustomCSV $config.csvLocation
 
     # En/disable InputAlias & OutputAlias button
-        if ($csvAlias -isnot [Array]) {$config.HasAlias = 'Collapsed'}
+    if ($csvAlias -isnot [Array]) {$config.HasAlias = 'Collapsed'}
         
     # Generate datagrid columns
     Write-Log 'Add  datagrid columns'

@@ -37,23 +37,22 @@ $rows.Undo.Add_Click({
 })
 
 $rows.InsertLast.Add_Click({
-    Add-Row 'InsertLast' $csv.Count $config.AppendCount $csvHeader $config.AppendFormat
+    $rows.Grid.ScrollIntoView($rows.Grid.Items[-1], $rows.Grid.Columns[0])
+    Add-Row $csv.Count $config.AppendCount $csvHeader $config.IsTemplate $config.AppendFormat
     Update-Grid
 })
 
 $rows.InsertAbove.Add_Click({
-    $rows.Grid.ScrollIntoView($rows.Grid.Items[-1], $rows.Grid.Columns[0])
-    
     $At = $csv.IndexOf($rows.Grid.SelectedItem)
     $Count = $rows.Grid.SelectedItems.Count
-    Add-Row 'InsertAbove' $At $Count $csvHeader
+    Add-Row $At $Count $csvHeader $config.IsTemplate $config.AppendFormat
     Update-Grid
 })
 
 $rows.InsertBelow.Add_Click({
     $At = $csv.IndexOf($rows.Grid.SelectedItem)
     $Count = $rows.Grid.SelectedItems.Count
-    Add-Row 'InsertAbove' ($At+$Count) $Count $csvHeader
+    Add-Row ($At+$Count) $Count $csvHeader $config.IsTemplate $config.AppendFormat
     Update-Grid
 })
 

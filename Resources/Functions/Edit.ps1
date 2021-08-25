@@ -53,9 +53,8 @@ function Invoke-Undo ($UndoStack, $Data) {
                 }
             }
 
-            'Insert(Above|Below|Last)' {
-                if ($Last.Action -eq 'InsertBelow') {$Offset = $Last.Conut}
-                $Data.RemoveRange($Last.RowIndex+$Offset, $Last.Count)
+            'Insert' {
+                $Data.RemoveRange($Last.RowIndex, $Last.Count)
             }
         }
 
@@ -64,42 +63,40 @@ function Invoke-Undo ($UndoStack, $Data) {
     return $UndoStack, $Data
 }
 
-function Add-Row ($Action, $At, $Count, $Header, $Format) {
-    # $Format and $Header only for $Action == 'InsertLast'
-    # Prepare blank template for inserting
+function Add-Row ($At, $Count, $Header, $IsTemplate, $LeftCellFormat) {
+    # $LeftCellFormat only used when $IsTemplate is TRUE
+    # Prepare blank row template
     $RowTemplate = [PSCustomObject] @{}
-    $Header.Foreach({$RowTemplate | Add-Member NoteProperty $_ ''})
-    
-    if ($Action -eq 'InsertLast') {
-        $Now = Get-Date
-        for ($i = 0; $i -lt $Count; $i++) {
-            # Expand <x> noation
-            $ThisRow = $RowTemplate.PSObject.Copy()
-            $ThisRow.($Header[0]) = $Format -replace
+    $Header.ForEach({$RowTemplate | Add-Member NoteProperty $_ ''})
+
+    # Insert rows
+    $Now = Get-Date
+    $ThisAt = $At
+    for ($i = 0; $i -lt $Count; $i++) {
+        # Expand <x> notation if $IsTemplate
+        $ThisRow = $RowTemplate.PSObject.Copy()
+        if ($IsTemplate) {
+            $ThisRow.($Header[0]) = $LeftCellFormat -replace
                 '<D>', $Now.ToString('yyyyMMdd') -replace
                 '<T>', $Now.ToString('HHmmss')   -replace
-                '<#>', $I
-            if ($csv) {
-                $script:csv.Insert($csv.Count, $ThisRow)
-            } else {
-                [Collections.ArrayList] $script:csv = @($ThisRow)
-            }
+                '<#>', $i
         }
         
-    } else {
-        # InsertAbove/InsertBelow
-        # Max & Min to prevent under/overflowing
-        $script:csv.InsertRange(
-            [Math]::Max(0, [Math]::Min($At, $csv.Count)),
-            @($RowTemplate)*$Count
-        )
+        if ($csv) {
+            # Make IDs arranged in ascending order
+            $script:csv.Insert($ThisAt, $ThisRow)
+            $ThisAt += 1
+
+        } else {
+            [Collections.ArrayList] $script:csv = @($ThisRow)
+        }
     }
 
     # Process undo
     $Parameters = @{
         UndoStack = $undo
         Data      = $csv
-        Operation = $Action
+        Operation = 'Insert'
         At        = $At
         OldRow    = ''
         Count     = $Count
