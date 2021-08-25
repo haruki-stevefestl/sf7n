@@ -13,7 +13,7 @@ function Get-CanEnableEditing ($UndoStack, $ReadWrite) {
     return [Bool] ($UndoStack) -and $ReadWrite
 }
 
-function Add-Undo ($UndoStack, $Data, $Operation, $At, $OldRow, $Count) {
+function Add-Undo ($UndoStack, $Operation, $At, $OldRow, $Count) {
     $ToAdd = [PSCustomObject] @{
         Action   = $Operation
         RowIndex = $At
@@ -95,7 +95,6 @@ function Add-Row ($At, $Count, $Header, $IsTemplate, $LeftCellFormat) {
     # Process undo
     $Parameters = @{
         UndoStack = $undo
-        Data      = $csv
         Operation = 'Insert'
         At        = $At
         OldRow    = ''

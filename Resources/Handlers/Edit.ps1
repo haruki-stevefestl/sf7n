@@ -15,7 +15,6 @@ $rows.Grid.Add_BeginningEdit({
 $rows.Grid.Add_RowEditEnding({
     $Parameters = @{
         UndoStack = $undo
-        Data      = $csv
         Operation = 'Change'
         At        = $csv.IndexOf($Args[1].Row.Item)
         OldRow    = $oldRow
@@ -60,7 +59,6 @@ $rows.RemoveSelected.Add_Click({
     $rows.Grid.SelectedItems.ForEach({
         $Parameters = @{
             UndoStack = $undo
-            Data      = $csv
             Operation = 'Remove'
             OldRow    = $_
             At        = $csv.IndexOf($_)
