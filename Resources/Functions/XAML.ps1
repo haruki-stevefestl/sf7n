@@ -9,8 +9,8 @@ function New-GUI ($ImportFrom) {
     # Populate $Hash with elements
     Write-Log '  - Identify elements'
     $Hash = [Hashtable]::Synchronized(@{})
-    $Xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]").Name.ForEach({
-        if ($Hash.Keys -notcontains $_) {$Hash.Add($_, $Form.FindName($_))}
+    $Xaml.SelectNodes('//*[@Name]').Name.ForEach({
+        $Hash[$_] = $Form.FindName($_)
     })
     
     return $Hash
