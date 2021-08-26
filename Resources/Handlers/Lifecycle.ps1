@@ -54,8 +54,8 @@ $rows.Rows.Add_ContentRendered({
     # Finalize UI
     $rows.Rows.DataContext = $config
     Search-CSV '' $csv
-    $rows.Splashscreen.Visibility = 'Collapsed'
     [GC]::Collect()
+    $rows.Splashscreen.Visibility = 'Collapsed'
 })
 
 # Prompt on exit if unsaved
@@ -78,4 +78,5 @@ $rows.Rows.Add_Closing({
         csvAlias,csvHeader,csv -Scope Script -Force
 
     Remove-Module DataContext,Edit,IO,Lifecycle,Search,XAML -Force
+    Pop-Location
 })

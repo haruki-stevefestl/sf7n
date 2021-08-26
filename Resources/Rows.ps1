@@ -20,7 +20,7 @@ Write-Log 'Rows 1.7'
 Write-Log 'Set  defaults'
 $PSDefaultParameterValues = @{'*:Encoding' = 'UTF8'}
 $script:baseDir = $PSScriptRoot
-Set-Location $baseDir
+Push-Location $baseDir
 Get-ChildItem *.ps1 -Recurse | Unblock-File
 Add-Type -AssemblyName PresentationFramework
 
