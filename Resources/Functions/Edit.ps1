@@ -3,13 +3,13 @@ function Update-Grid {
     $rows.Rows.Title = 'Rows  -  Unsaved changes'
     $rows.Undo.IsEnabled   = $true
     $rows.Commit.IsEnabled = $true
-    $rows.Grid.ItemsSource = @($csv)
+    $rows.Grid.ItemsSource = $csv
     $rows.Grid.Items.Refresh()
 }
 
 # Do not allow Undo and Commit buttons if
 # there are no undo steps or ReadWrite is off 
-function Get-CanEnableEditing ($UndoStack, $ReadWrite) {
+function Get-CanEdit ($UndoStack, $ReadWrite) {
     return [Bool] ($UndoStack) -and $ReadWrite
 }
 
@@ -22,11 +22,13 @@ function Add-Undo ($UndoStack, $Operation, $At, $OldRow, $Count) {
     }
     
     # Thanks to Microsoft, it is almost impossible to
-    # detect if the row was changed or just accessed,
-    # so for now all actions are written into $UndoStack
+    # detect if the row was changed or read only,
+    # so for now all non-duplicate actions are written into $UndoStack
     # See https://stackoverflow.com/q/30640700/
     if ($UndoStack) {
-        $UndoStack.Add($ToAdd)
+        if ($UndoStack[-1] -ne $ToAdd) {
+            $UndoStack.Add($ToAdd)
+        }
         
     } else {
         # @($null, ) since PSv5 (only) cannot handle single element
@@ -34,33 +36,6 @@ function Add-Undo ($UndoStack, $Operation, $At, $OldRow, $Count) {
         [Collections.ArrayList] $UndoStack = @($null, $ToAdd)
     }
     return $UndoStack
-}
-
-function Invoke-Undo ($UndoStack, $Data) {
-    if ($UndoStack) {
-        $Last = $UndoStack[-1]
-
-        switch -regex ($Last.Action) {
-            'Change' {
-                $Data[$Last.RowIndex] = $Last.Original
-            }
-
-            'Remove' {
-                if ($Data) {
-                    $Data.Insert($Last.RowIndex, $Last.Original)
-                } else {
-                    [Collections.ArrayList] $Data = @($Last.Original)
-                }
-            }
-
-            'Insert' {
-                $Data.RemoveRange($Last.RowIndex, $Last.Count)
-            }
-        }
-
-        $UndoStack.RemoveAt($UndoStack.Count-1)
-    }
-    return $UndoStack, $Data
 }
 
 function Add-Row ($At, $Count, $Header, $IsTemplate, $LeftCellFormat) {
@@ -85,7 +60,7 @@ function Add-Row ($At, $Count, $Header, $IsTemplate, $LeftCellFormat) {
         if ($csv) {
             # Make IDs arranged in ascending order
             $script:csv.Insert($ThisAt, $ThisRow)
-            $ThisAt += 1
+            $ThisAt++
 
         } else {
             [Collections.ArrayList] $script:csv = @($ThisRow)

@@ -2,7 +2,7 @@
 $rows.ReadWrite.Add_Click({
     $rows.Undo.IsEnabled = 
         $rows.Commit.IsEnabled =
-            Get-CanEnableEditing $undo $config.ReadWrite
+            Get-CanEdit $undo $config.ReadWrite
 })
 
 # Enter edit mode
@@ -25,33 +25,68 @@ $rows.Grid.Add_RowEditEnding({
     [Collections.ArrayList] $script:undo = Add-Undo @Parameters
     $rows.Undo.IsEnabled = 
         $rows.Commit.IsEnabled =
-            Get-CanEnableEditing $undo $config.ReadWrite
+            Get-CanEdit $undo $config.ReadWrite
 })
 
 # Each function below corresponds to a button in the GUI
 $rows.Undo.Add_Click({
-    $script:undo, $script:csv = Invoke-Undo $undo $csv
-    $rows.Undo.IsEnabled = Get-CanEnableEditing $undo $config.ReadWrite
+    if ($undo) {
+        $Last = $undo[-1]
+        switch ($Last.Action) {
+            'Change' {$csv[$Last.RowIndex] = $Last.Original}
+
+            'Remove' {
+                if ($csv) {
+                    $csv.Insert($Last.RowIndex, $Last.Original)
+                } else {
+                    [Collections.ArrayList] $script:csv = @($Last.Original)
+                }
+            }
+
+            'Insert' {$csv.RemoveRange($Last.RowIndex, $Last.Count)}
+        }
+        $undo.RemoveAt($undo.Count-1)
+    }
+
+    $rows.Undo.IsEnabled = Get-CanEdit $undo $config.ReadWrite
     Update-Grid
 })
 
 $rows.InsertLast.Add_Click({
     $rows.Grid.ScrollIntoView($rows.Grid.Items[-1], $rows.Grid.Columns[0])
-    Add-Row $csv.Count $config.AppendCount $csvHeader $config.IsTemplate $config.AppendFormat
+    $Parameters = @{
+        At     = $csv.Count
+        Count  = $config.AppendCount
+        Header = $csvHeader
+        IsTemplate     = $config.IsTemplate
+        LeftCellFormat = $config.AppendFormat
+    }
+    Add-Row @Parameters
     Update-Grid
 })
 
 $rows.InsertAbove.Add_Click({
-    $At = $csv.IndexOf($rows.Grid.SelectedItem)
-    $Count = $rows.Grid.SelectedItems.Count
-    Add-Row $At $Count $csvHeader $config.IsTemplate $config.AppendFormat
+    $Parameters = @{
+        At     = $csv.IndexOf($rows.Grid.SelectedItem)
+        Count  = $rows.Grid.SelectedItems.Count
+        Header = $csvHeader
+        IsTemplate     = $config.IsTemplate
+        LeftCellFormat = $config.AppendFormat
+    }
+    Add-Row @Parameters
     Update-Grid
 })
 
 $rows.InsertBelow.Add_Click({
-    $At = $csv.IndexOf($rows.Grid.SelectedItem)
-    $Count = $rows.Grid.SelectedItems.Count
-    Add-Row ($At+$Count) $Count $csvHeader $config.IsTemplate $config.AppendFormat
+    $Parameters = @{
+        At     = $csv.IndexOf($rows.Grid.SelectedItem)
+        Count  = $rows.Grid.SelectedItems.Count
+        Header = $csvHeader
+        IsTemplate     = $config.IsTemplate
+        LeftCellFormat = $config.AppendFormat
+    }
+    $Parameters.At += $Parameters.Count
+    Add-Row @Parameters
     Update-Grid
 })
 
