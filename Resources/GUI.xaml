@@ -270,7 +270,18 @@
 
         <!-- Status bar (bottom) -->
         <DockPanel Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Bottom">
-            <TextBlock Text="{Binding ElementName=Grid, Path=Items.Count, StringFormat='\{0\} item(s)'}" Style="{StaticResource Caption}" Margin="0,0,48,0"/>
+            <TextBlock Margin="0,0,48,0">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=Grid, Path=Items.Count}" Value="1">
+                                <Setter Property="Text" Value="1 item"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                        <Setter Property="Text" Value="{Binding ElementName=Grid, Path=Items.Count, StringFormat='\{0\} items'}"/>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
             <TextBlock Text="{Binding ElementName=Grid, Path=SelectedItems.Count, StringFormat='\{0\} selected'}" Style="{StaticResource Caption}"/>
             <TextBlock Name="Status" Style="{StaticResource Caption}" HorizontalAlignment="Right"/>
         </DockPanel>
