@@ -111,7 +111,7 @@
                     <CheckBox Content=" Input Alias" IsChecked="{Binding InputAlias}" VerticalAlignment="Center"/>
                     <CheckBox Grid.Column="1" Name="OutputAlias" Content=" Output Alias" IsChecked="{Binding OutputAlias}" VerticalAlignment="Center" Margin="48,0"/>
                 </StackPanel>
-                <Grid Grid.Column="2" Margin="8,0">
+                <Grid Grid.Column="2" Margin="0,0,8,0">
                     <TextBlock Foreground="{StaticResource Brush_Caption}" Background="White" Height="24" Padding="7,3">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -282,13 +282,23 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
-            <TextBlock Text="{Binding ElementName=Grid, Path=SelectedItems.Count, StringFormat='\{0\} selected'}" Style="{StaticResource Caption}"/>
+            <TextBlock>
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=Grid, Path=SelectedItems.Count}" Value="0">
+                                <Setter Property="Text" Value=""/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                        <Setter Property="Text" Value="{Binding ElementName=Grid, Path=SelectedItems.Count, StringFormat='\{0\} selected'}"/>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
             <TextBlock Name="Status" Style="{StaticResource Caption}" HorizontalAlignment="Right"/>
         </DockPanel>
 
         <!-- Splashscreen -->
-        <DockPanel Name="Splashscreen" Grid.RowSpan="3" Grid.ColumnSpan="2" Margin="-18,-16" Background="White" Visibility="Collapsed">
-            <TextBlock Text="Rows 1.7" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </DockPanel>
+        <Label Content="Rows 1.7" FontWeight="Bold" Name="Splashscreen" Background="White" Visibility="Collapsed" Margin="-18,-16"
+               Grid.RowSpan="3" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
     </Grid>
 </Window>
